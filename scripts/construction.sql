@@ -5,7 +5,9 @@ CREATE TABLE T_CUSTOMER (
   GENDER  INTEGER,
   ADDRESS TEXT,
   PHONE   TEXT NOT NULL,
-  DELETED INTEGER
+  MODIFY_TIME TEXT,
+  DELETED     INTEGER,
+  MODIFIER    TEXT
 );
 
 -- 车辆信息表
@@ -27,5 +29,8 @@ CREATE TABLE T_VEHICLE (
   INSURANCE_END_DATE    TEXT,             --保险到期日期
   LOAN_TERM   TEXT NOT NULL,              --贷款年限
   LOAN_VALUE  TEXT,                       --贷款金额
-  REMARK      TEXT                        --备注
+  REMARK      TEXT,                        --备注
+  MODIFY_TIME TEXT,
+  DELETED     INTEGER,
+  MODIFIER    TEXT
 );
