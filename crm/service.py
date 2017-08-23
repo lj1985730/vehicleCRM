@@ -1,8 +1,8 @@
 # coding=utf-8
-import sqlite
-import uuid
 import datetime
-import auth
+import uuid
+
+from crm import auth, sqlite
 
 
 def get_now():
