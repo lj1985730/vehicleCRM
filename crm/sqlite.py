@@ -6,42 +6,45 @@ import sqlite3
 class Database(object):
 
     """
-        数据库操作对象
+    数据库操作对象
     """
     def __init__(self):
-        self.conn = sqlite3.connect("data/vehicleCrm.db")
+        self.conn = None
 
     '''
-        提交
+    提交
     '''
     def commit(self):
         self.conn.commit()
 
     '''
-        关闭
+    关闭
     '''
     def close(self):
         self.conn.close()
 
     '''
-        获取数据库游标
+    连接数据库
     '''
-    def get_cursor(self):
-        return self.conn.cursor()
+    def connect(self):
+        self.conn = sqlite3.connect("..\\data\\vehicleCrm.db")
+        return self.conn
 
     '''
-        执行查询语句
-        @sql 要执行的脚本
-        @data 数据元组
+    执行查询语句
+    @sql 要执行的脚本
+    @data 数据元组
     '''
     def execute_query(self, sql, data):
-        cur = self.get_cursor
-        if data is not null and len(data) > 0:
+        cur = self.connect().cursor()
+        if data is not None and len(data) > 0:
             res = cur.execute(sql, data)
         else:
             res = cur.execute(sql)
         result = res.fetchall()
         cur.close()
+        self.commit()
+        self.close()
         return result
 
     '''
@@ -50,12 +53,14 @@ class Database(object):
         @data 数据元组
     '''
     def execute_update(self, sql, data):
-        cur = self.get_cursor
-        if data is not null and len(data) > 0:
+        cur = self.connect().cursor()
+        if data is not None and len(data) > 0:
             cur.execute(sql, data)
         else:
             cur.execute(sql)
         cur.close()
+        self.commit()
+        self.close()
 
     '''
         获取表全部数据
