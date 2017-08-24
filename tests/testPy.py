@@ -2,6 +2,7 @@ import unittest
 import uuid
 import datetime
 
+
 class TestPy(unittest.TestCase):
     # 初始化工作
     def setUp(self):
@@ -19,6 +20,10 @@ class TestPy(unittest.TestCase):
         print(type(threshold))
         print(threshold)
 
+    # test uuid
+    def testUUID(self):
+        print(str(uuid.uuid1()).upper())
+
 
 if __name__ == '__main__':
-    TestPy.main()
+    TestPy()
