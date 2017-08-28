@@ -19,7 +19,7 @@ class MainFrame(wx.Frame):
     def make_menu_bar(self):
 
         operate_menu = wx.Menu()
-        login_item = operate_menu.Append(-1, "登录", u"登录后方能操作")
+        login_item = operate_menu.Append(-1, "登录(&L)", u"登录后方能操作")
 
         operate_menu.AppendSeparator()
 
