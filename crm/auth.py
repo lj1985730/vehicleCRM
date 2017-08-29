@@ -4,7 +4,7 @@ from crm import sqlite
 
 class Auth:
 
-    logon_user = ''
+    logon_user = None
 
     @classmethod
     def login(cls, account, password):

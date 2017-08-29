@@ -27,6 +27,20 @@ class CrmService:
         pass
 
     '''
+    查询客户
+    @return 客户信息元组(名称，性别，地址，电话, 备注)
+    '''
+    @staticmethod
+    def search_customer():
+        # 数据库对象
+        db = sqlite.Database()
+        # # 操作语句
+        sql = "SELECT ID, NAME, CASE WHEN GENDER = 1 THEN '男' ELSE '女' END AS GENDER,"\
+            " PHONE, ADDRESS, REMARK FROM T_CUSTOMER;"
+        # # 执行数据库操作
+        return db.execute_query(sql, None)
+
+    '''
     新增客户
     @customer 客户信息元组(名称，性别，地址，电话, 备注)
     '''
@@ -72,6 +86,23 @@ class CrmService:
         data = (get_now(), auth.Auth.logon_user, data_id)
         # 执行数据库操作
         db.execute_update(sql, data)
+
+    '''
+    查询客户
+    @:return 车辆信息元组(名称，性别，地址，电话, 备注)
+    '''
+    @staticmethod
+    def search_vehicle(customer_id: str):
+        # 数据库对象
+        db = sqlite.Database()
+        # # 操作语句
+        sql = "SELECT * FROM T_VEHICLE;"
+
+        if customer_id is not None:
+            sql = sql + " WHERE CUSTOMER_ID = ?"
+
+        # # 执行数据库操作
+        return db.execute_query(sql, customer_id)
 
     '''
     新增车辆
