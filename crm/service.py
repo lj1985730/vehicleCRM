@@ -35,8 +35,8 @@ class CrmService:
         # 数据库对象
         db = sqlite.Database()
         # # 操作语句
-        sql = "SELECT ID, NAME, CASE WHEN GENDER = 1 THEN '男' ELSE '女' END AS GENDER,"\
-            " PHONE, ADDRESS, REMARK FROM T_CUSTOMER;"
+        sql = "SELECT NAME, CASE WHEN GENDER = 1 THEN '男' ELSE '女' END AS GENDER,"\
+            " PHONE, ADDRESS, REMARK, ID FROM T_CUSTOMER WHERE DELETED = 0;"
         # # 执行数据库操作
         return db.execute_query(sql, None)
 
@@ -92,14 +92,20 @@ class CrmService:
     @:return 车辆信息元组(名称，性别，地址，电话, 备注)
     '''
     @staticmethod
-    def search_vehicle(customer_id: str):
+    def search_vehicle(customer_id):
         # 数据库对象
         db = sqlite.Database()
         # # 操作语句
-        sql = "SELECT * FROM T_VEHICLE;"
+        sql = "SELECT B.NAME, A.MODEL, A.REG_DATE, A.MILEAGE, A.TRANSFER_COUNT, " \
+              "A.LOAN_PRODUCT, A.LOAN_PERIOD, A.LOAN_TERM, A.LOAN_VALUE, A.LOAN_REPORT_DATE, " \
+              "A.LOAN_PASSED_DATE, A.LOAN_DATE, " \
+              "A.INSURANCE_COMPANY, A.INSURANCE_TYPE, A.INSURANCE_START_DATE, A.INSURANCE_END_DATE, " \
+              "A.REMARK, C.NAME, A.MODIFY_TIME, A.ID " \
+              "FROM T_VEHICLE A, T_CUSTOMER B, T_ACCOUNT C " \
+              "WHERE A.CUSTOMER_ID = B.ID AND A.MODIFIER = C.ID AND A.DELETED = 0 AND B.DELETED = 0;"
 
         if customer_id is not None:
-            sql = sql + " WHERE CUSTOMER_ID = ?"
+            sql = sql + " AND CUSTOMER_ID = ?"
 
         # # 执行数据库操作
         return db.execute_query(sql, customer_id)

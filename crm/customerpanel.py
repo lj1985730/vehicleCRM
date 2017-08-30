@@ -1,7 +1,7 @@
 # coding=utf-8
 import wx
 import wx.grid as gridlib
-from crm import service
+from crm import service, customerwin
 
 
 class CustomerPanel(wx.Panel):
@@ -10,7 +10,39 @@ class CustomerPanel(wx.Panel):
     """
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+
+        opt_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.createBtn = wx.Button(self, wx.ID_ANY, u"新增", wx.DefaultPosition, wx.DefaultSize, 0)
+        opt_sizer.Add(self.createBtn, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+        self.updateBtn = wx.Button(self, wx.ID_ANY, u"修改", wx.DefaultPosition, wx.DefaultSize, 0)
+        opt_sizer.Add(self.updateBtn, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+        self.deleteBtn = wx.Button(self, wx.ID_ANY, u"删除", wx.DefaultPosition, wx.DefaultSize, 0)
+        opt_sizer.Add(self.deleteBtn, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+        sizer.Add(opt_sizer, 0, wx.ALIGN_RIGHT, 5)
+        self.enable_btn()
+
         self.grid = CustomerGrid(self)
+        sizer.Add(self.grid, 1, wx.ALL | wx.EXPAND, 5)
+
+        self.SetSizer(sizer)
+
+    def enable_btn(self):
+        self.Bind(wx.EVT_MENU, self.open_create, self.createBtn)
+        self.Bind(wx.EVT_MENU, self.on_exit, self.updateBtn)
+        self.Bind(wx.EVT_MENU, self.on_show_customer, self.deleteBtn)
+
+    def open_create(self):
+        self.edit_win = customerwin.CustomerWin()
+        self.edit_win.CenterOnScreen()
+
+        val = self.edit_win.ShowModal()
+
+        if val == wx.ID_OK:
+            self.edit_win.do_login()
+            self.toggle_menu()
+
+            self.edit_win.Destroy()
 
 
 class CustomerDataTable(gridlib.GridTableBase):
@@ -38,13 +70,13 @@ class CustomerDataTable(gridlib.GridTableBase):
 
     def IsEmptyCell(self, row, col):
         try:
-            return not self.data[row][col+1]
+            return not self.data[row][col]
         except IndexError:
             return True
 
     def GetValue(self, row, col):
         try:
-            return self.data[row][col+1]
+            return self.data[row][col]
         except IndexError:
             return ''
 
@@ -67,6 +99,9 @@ class CustomerGrid(gridlib.Grid):
         self.AutoSize()
         self.CanDragGridSize()
         self.EnableEditing(False)
+
+        self.SetColLabelAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
+        self.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
 
         # simple cell formatting
 

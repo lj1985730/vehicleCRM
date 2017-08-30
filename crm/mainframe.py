@@ -1,6 +1,6 @@
 # coding=utf-8
 import wx
-from crm import loginwin, auth, customerpanel, vehicletable
+from crm import loginwin, auth, customerpanel, vehiclepanel
 import wx.lib.agw.flatnotebook as fnb
 
 
@@ -18,8 +18,8 @@ class MainFrame(wx.Frame):
         self.book = None
         self._rmenu = None
 
-        self.create_right_click_menu()
         self.layout_book()
+        # self.create_right_click_menu()
 
         self.CreateStatusBar()    # 状态栏
         self.Center()
@@ -73,14 +73,14 @@ class MainFrame(wx.Frame):
         self._rmenu = wx.Menu()
         item = wx.MenuItem(self._rmenu, -1, "关闭Tab\tCtrl+F4", "关闭Tab")
         self._rmenu.Append(item)
+        # Set right click menu to the notebook
+        self.book.SetRightClickMenu(self._rmenu)
 
     '''
     初始化book
     '''
     def layout_book(self):
         self.book = fnb.FlatNotebook(self, wx.ID_ANY, agwStyle=fnb.FNB_DCLICK_CLOSES_TABS)
-        # Set right click menu to the notebook
-        self.book.SetRightClickMenu(self._rmenu)
 
     '''
     注销
@@ -118,5 +118,5 @@ class MainFrame(wx.Frame):
     '''
     def on_show_vehicle(self, event):
         self.Freeze()
-        self.book.AddPage(vehicletable.VehicleTable(self.book), "车辆信息", True)
+        self.book.AddPage(vehiclepanel.VehiclePanel(self.book), "车辆信息", True)
         self.Thaw()
