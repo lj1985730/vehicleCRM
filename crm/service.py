@@ -42,14 +42,15 @@ class CrmService:
 
     '''
     新增客户
-    @customer 客户信息元组(名称，性别，地址，电话, 备注)
+    @customer 客户信息元组(名称，性别，电话, 地址，备注)
     '''
     @staticmethod
     def save_customer(customer):
         # 数据库对象
         db = sqlite.Database()
         # # 操作语句
-        sql = "INSERT INTO T_CUSTOMER VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?);"
+        sql = "INSERT INTO T_CUSTOMER(ID, NAME, GENDER, PHONE, ADDRESS, REMARK, MODIFY_TIME, MODIFIER) " \
+              "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?);"
         # # 数据集合
         data = (get_uuid(),) + customer + (get_now(), auth.Auth.logon_user)
         # # 执行数据库操作
@@ -65,7 +66,7 @@ class CrmService:
         # 数据库对象
         db = sqlite.Database()
         # 操作语句
-        sql = "UPDATE T_CUSTOMER SET NAME = ?, GENDER = ?, ADDRESS = ?, PHONE = ?, REMARK = ?," \
+        sql = "UPDATE T_CUSTOMER SET NAME = ?, GENDER = ?, PHONE = ?, ADDRESS = ?, REMARK = ?," \
               "MODIFY_TIME = ?, DELETED = 0, MODIFIER = ? WHERE ID = ?;"
         # 数据集合
         data = customer + (get_now(), auth.Auth.logon_user, data_id)

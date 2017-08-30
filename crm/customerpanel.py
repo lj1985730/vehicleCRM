@@ -11,38 +11,76 @@ class CustomerPanel(wx.Panel):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         sizer = wx.BoxSizer(wx.VERTICAL)
-
+        self.edit_win = None
         opt_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.createBtn = wx.Button(self, wx.ID_ANY, u"新增", wx.DefaultPosition, wx.DefaultSize, 0)
-        opt_sizer.Add(self.createBtn, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
-        self.updateBtn = wx.Button(self, wx.ID_ANY, u"修改", wx.DefaultPosition, wx.DefaultSize, 0)
-        opt_sizer.Add(self.updateBtn, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
-        self.deleteBtn = wx.Button(self, wx.ID_ANY, u"删除", wx.DefaultPosition, wx.DefaultSize, 0)
-        opt_sizer.Add(self.deleteBtn, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
-        sizer.Add(opt_sizer, 0, wx.ALIGN_RIGHT, 5)
-        self.enable_btn()
 
+        create_btn = wx.Button(self, wx.ID_ANY, u"新增")
+        self.Bind(wx.EVT_BUTTON, self.open_create, create_btn)
+        opt_sizer.Add(create_btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        update_btn = wx.Button(self, wx.ID_ANY, u"修改")
+        self.Bind(wx.EVT_BUTTON, self.open_modify, update_btn)
+        opt_sizer.Add(update_btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        delete_btn = wx.Button(self, wx.ID_ANY, u"删除")
+        self.Bind(wx.EVT_BUTTON, self.on_delete, delete_btn)
+        opt_sizer.Add(delete_btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        sizer.Add(opt_sizer, 0, wx.ALIGN_RIGHT, 5)
         self.grid = CustomerGrid(self)
         sizer.Add(self.grid, 1, wx.ALL | wx.EXPAND, 5)
-
         self.SetSizer(sizer)
 
-    def enable_btn(self):
-        self.Bind(wx.EVT_MENU, self.open_create, self.createBtn)
-        self.Bind(wx.EVT_MENU, self.on_exit, self.updateBtn)
-        self.Bind(wx.EVT_MENU, self.on_show_customer, self.deleteBtn)
-
-    def open_create(self):
-        self.edit_win = customerwin.CustomerWin()
+    """
+    打开新增页
+    """
+    def open_create(self, event):
+        self.edit_win = customerwin.CustomerWin(self)
         self.edit_win.CenterOnScreen()
-
         val = self.edit_win.ShowModal()
-
         if val == wx.ID_OK:
-            self.edit_win.do_login()
-            self.toggle_menu()
+            self.edit_win.save()
+            wx.MessageBox(u"保存成功！", "通知")
+        self.edit_win.Destroy()
+        self.grid.Refresh()
 
-            self.edit_win.Destroy()
+    """
+    打开修改页
+    """
+    def open_modify(self, event):
+        rows = self.grid.GetSelectedRows()
+        if rows is None or len(rows) == 0:
+            wx.MessageBox(u"请选择要修改的数据！", "警告")
+            return False
+        selected = rows[0]
+        select_data = self.grid.GetTable().data[selected]
+        self.edit_win = customerwin.CustomerWin(self)
+        self.edit_win.set_data(select_data)
+        self.edit_win.CenterOnScreen()
+        val = self.edit_win.ShowModal()
+        if val == wx.ID_OK:
+            self.edit_win.update()
+            wx.MessageBox(u"修改成功！", "通知")
+        self.grid.GetTable().data[selected] = self.edit_win.get_data()
+        self.edit_win.Destroy()
+        self.grid.Refresh()
+
+    """
+    删除
+    """
+    def on_delete(self, event):
+        rows = self.grid.GetSelectedRows()
+        if rows is None or len(rows) == 0:
+            wx.MessageBox(u"请选择要删除的数据！", "警告")
+            return False
+
+        # wx.Confir
+
+        selected = rows[0]
+        old_data = self.grid.GetTable().data
+        new_data = old_data[0:selected-1] + old_data[selected:]
+        self.grid.GetTable().data = new_data
+        self.grid.Refresh()
 
 
 class CustomerDataTable(gridlib.GridTableBase):
@@ -94,6 +132,8 @@ class CustomerGrid(gridlib.Grid):
     def __init__(self, parent):
         gridlib.Grid.__init__(self, parent, -1)
 
+        self.selected = None
+
         self.SetTable(CustomerDataTable(), True)
 
         self.AutoSize()
@@ -102,6 +142,11 @@ class CustomerGrid(gridlib.Grid):
 
         self.SetColLabelAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
         self.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
+
+        # self.Bind(gridlib.EVT_GRID_LABEL_LEFT_CLICK, self.OnLabelLeftClick)
+
+    def OnLabelLeftClick(self, evt):
+        self.selected = evt.GetRow()
 
         # simple cell formatting
 

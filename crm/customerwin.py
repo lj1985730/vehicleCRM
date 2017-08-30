@@ -1,76 +1,148 @@
 # coding=utf-8
 import wx
 import wx.xrc
+from crm import service, textvalidator
 
 
 # Class CustomerWin
 class CustomerWin(wx.Dialog):
     def __init__(self, parent):
-        wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title=u" 编辑客户", pos=wx.DefaultPosition, size=wx.Size(541, 455),
+        wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title=u" 编辑客户", pos=wx.DefaultPosition, size=wx.DefaultSize,
                            style=wx.DEFAULT_DIALOG_STYLE)
 
-        self.SetSizeHints(wx.Size(450, -1), wx.DefaultSize)
+        self.data = None
 
-        customer_sizer = wx.GridSizer(4, 2, 0, 0)
+        border = wx.BoxSizer(wx.VERTICAL)
 
-        self.customerNameLabel = wx.StaticText(self, wx.ID_ANY, u"* 姓名：", wx.DefaultPosition, wx.Size(100, -1), 0)
-        self.customerNameLabel.Wrap(-1)
-        self.customerNameLabel.SetForegroundColour(wx.Colour(255, 0, 0))
+        # 姓名
+        box = wx.BoxSizer(wx.HORIZONTAL)
 
-        customer_sizer.Add(self.customerNameLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT | wx.ALL, 5)
+        label = wx.StaticText(self, wx.ID_ANY, u"* 姓名：")
+        label.SetForegroundColour(wx.RED)
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
 
-        self.customerNameInput = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(200, -1), 0)
-        self.customerNameInput.SetMinSize(wx.Size(200, -1))
+        self.customerNameInput = wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1),
+                                             validator=textvalidator.TextValidator())
+        box.Add(self.customerNameInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
-        customer_sizer.Add(self.customerNameInput, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+        border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
-        self.customerGenderLabel = wx.StaticText(self, wx.ID_ANY, u"性别：", wx.DefaultPosition, wx.Size(100, -1), 0)
-        self.customerGenderLabel.Wrap(-1)
-        customer_sizer.Add(self.customerGenderLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT | wx.ALL, 5)
+        # 性别
+        box = wx.BoxSizer(wx.HORIZONTAL)
 
-        customer_gender_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        label = wx.StaticText(self, wx.ID_ANY, u"  性别：")
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         self.customerGender1 = wx.RadioButton(self, wx.ID_ANY, u"男", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
         self.customerGender1.SetValue(True)
-        customer_gender_sizer.Add(self.customerGender1, 0, wx.ALIGN_CENTER | wx.ALL | wx.EXPAND, 5)
-
+        box.Add(self.customerGender1, 1, wx.ALIGN_CENTER | wx.ALL | wx.EXPAND, 5)
         self.customerGender2 = wx.RadioButton(self, wx.ID_ANY, u"女", wx.DefaultPosition, wx.DefaultSize, 0)
-        customer_gender_sizer.Add(self.customerGender2, 0, wx.ALIGN_CENTER | wx.ALL | wx.EXPAND, 5)
+        box.Add(self.customerGender2, 1, wx.ALIGN_CENTER | wx.ALL | wx.EXPAND, 5)
 
-        customer_sizer.Add(customer_gender_sizer, 1, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
-        self.customerPhoneLabel = wx.StaticText(self, wx.ID_ANY, u"* 电话：", wx.DefaultPosition, wx.Size(100, -1), 0)
-        self.customerPhoneLabel.Wrap(-1)
-        self.customerPhoneLabel.SetForegroundColour(wx.Colour(255, 0, 0))
+        # 电话
+        box = wx.BoxSizer(wx.HORIZONTAL)
 
-        customer_sizer.Add(self.customerPhoneLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT | wx.ALL, 5)
+        label = wx.StaticText(self, wx.ID_ANY, u"* 电话：")
+        label.SetForegroundColour(wx.Colour(255, 0, 0))
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
 
-        self.customerPhoneInput = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(200, -1), 0)
-        self.customerPhoneInput.SetMinSize(wx.Size(200, -1))
+        self.customerPhoneInput = wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1),
+                                              validator=textvalidator.TextValidator())
+        box.Add(self.customerPhoneInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
-        customer_sizer.Add(self.customerPhoneInput, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+        border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
-        self.customerAddressLabel = wx.StaticText(self, wx.ID_ANY, u"地址：", wx.DefaultPosition, wx.Size(100, -1), 0)
-        self.customerAddressLabel.Wrap(-1)
-        customer_sizer.Add(self.customerAddressLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT | wx.ALL, 5)
+        # 地址
+        box = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.customerAddressInput = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(200, -1),
-                                                0)
-        self.customerAddressInput.SetMinSize(wx.Size(200, -1))
+        label = wx.StaticText(self, wx.ID_ANY, u"  地址：")
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
 
-        customer_sizer.Add(self.customerAddressInput, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+        self.customerAddressInput = wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1))
+        box.Add(self.customerAddressInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
-        self.customerOK = wx.Button(self, wx.ID_ANY, u"保存", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.customerOK.SetDefault()
-        customer_sizer.Add(self.customerOK, 0, wx.ALIGN_CENTER | wx.ALL, 5)
+        border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
-        self.customerCancel = wx.Button(self, wx.ID_ANY, u"取消", wx.DefaultPosition, wx.DefaultSize, 0)
-        customer_sizer.Add(self.customerCancel, 0, wx.ALIGN_CENTER | wx.ALL, 5)
+        # 备注
+        box = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.SetSizer(customer_sizer)
-        self.Layout()
+        label = wx.StaticText(self, wx.ID_ANY, u"  备注：")
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
 
-        self.Centre(wx.BOTH)
+        self.customerRemarkInput = wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1), style=wx.TE_MULTILINE)
+        box.Add(self.customerRemarkInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
-    def __del__(self):
-        pass
+        border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        line = wx.StaticLine(self, -1, size=wx.DefaultSize, style=wx.HORIZONTAL)
+        border.Add(line, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.TOP, 5)
+
+        # 按钮
+        buttons = wx.StdDialogButtonSizer()
+        btn = wx.Button(self, wx.ID_OK, u"保存")
+        btn.SetDefault()
+        buttons.Add(btn)
+        btn = wx.Button(self, wx.ID_CANCEL, u"取消")
+        buttons.Add(btn)
+        buttons.Realize()
+        border.Add(buttons, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
+
+        self.SetSizer(border)
+        border.Fit(self)
+
+    """
+    表单赋值
+    """
+    def set_data(self, data):
+        self.data = data
+        self.customerNameInput.SetValue(self.data[0])
+        if self.data[1] == '男':
+            self.customerGender1.SetValue(True)
+        else:
+            self.customerGender2.SetValue(True)
+        self.customerPhoneInput.SetValue(self.data[2])
+        self.customerAddressInput.SetValue(self.data[3])
+        self.customerRemarkInput.SetValue(self.data[4])
+
+    """
+    表单取值
+    """
+    def get_form_values(self, transfer):
+        if transfer:
+            gender = '女'
+            if self.customerGender1.GetValue():
+                gender = '男'
+        else:
+            gender = 2
+            if self.customerGender1.GetValue():
+                gender = 1
+        return (
+            self.customerNameInput.GetValue().strip(),
+            gender,
+            self.customerPhoneInput.GetValue().strip(),
+            self.customerAddressInput.GetValue().strip(),
+            self.customerRemarkInput.GetValue().strip()
+        )
+
+    """
+    取值
+    """
+    def get_data(self):
+        customer = self.get_form_values(True)
+        return customer + (self.data[5],)
+
+    """
+    保存
+    """
+    def save(self):
+        customer = self.get_form_values(False)
+        service.CrmService.save_customer(customer)
+
+    """
+    更新
+    """
+    def update(self):
+        customer = self.get_form_values(False)
+        service.CrmService.update_customer(self.data[5], customer)

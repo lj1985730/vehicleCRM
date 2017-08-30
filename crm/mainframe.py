@@ -24,10 +24,6 @@ class MainFrame(wx.Frame):
         self.CreateStatusBar()    # 状态栏
         self.Center()
 
-        # self.Bind(fnb.EVT_FLATNOTEBOOK_PAGE_CHANGING, self.OnPageChanging)
-        # self.Bind(fnb.EVT_FLATNOTEBOOK_PAGE_CHANGED, self.OnPageChanged)
-        # self.Bind(fnb.EVT_FLATNOTEBOOK_PAGE_CLOSING, self.OnPageClosing)
-
     """
     生成主菜单
     """

@@ -16,25 +16,19 @@ class LoginWin(wx.Dialog):
         sizer.Add(title, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         login_name_sizer = wx.BoxSizer(wx.HORIZONTAL)
-
         self.loginNameLabel = wx.StaticText(self, wx.ID_ANY, u"账户：")
         login_name_sizer.Add(self.loginNameLabel, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
-
         self.loginNameInput = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, size=(80, -1))
         self.loginNameInput.SetMaxLength(20)
         login_name_sizer.Add(self.loginNameInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
-
         sizer.Add(login_name_sizer, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
         login_pass_sizer = wx.BoxSizer(wx.HORIZONTAL)
-
         self.loginPassLabel = wx.StaticText(self, wx.ID_ANY, u"密码：")
         login_pass_sizer.Add(self.loginPassLabel, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
-
         self.loginPassInput = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, size=(80, -1), style=wx.TE_PASSWORD)
         self.loginPassInput.SetMaxLength(20)
         login_pass_sizer.Add(self.loginPassInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
-
         sizer.Add(login_pass_sizer, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
         line = wx.StaticLine(self, -1, size=(20, -1), style=wx.HORIZONTAL)
