@@ -10,6 +10,9 @@ class CustomerPanel(wx.Panel):
     """
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
+
+        self.service = service.CrmService()
+
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.edit_win = None
         opt_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -27,8 +30,10 @@ class CustomerPanel(wx.Panel):
         opt_sizer.Add(delete_btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
         sizer.Add(opt_sizer, 0, wx.ALIGN_RIGHT, 5)
+
         self.grid = CustomerGrid(self)
         sizer.Add(self.grid, 1, wx.ALL | wx.EXPAND, 5)
+
         self.SetSizer(sizer)
 
     """
@@ -42,7 +47,8 @@ class CustomerPanel(wx.Panel):
             self.edit_win.save()
             wx.MessageBox(u"保存成功！", "通知")
         self.edit_win.Destroy()
-        self.grid.Refresh()
+        self.grid.GetTable().data = self.service.search_customer()
+        self.grid.reset()
 
     """
     打开修改页
@@ -61,9 +67,9 @@ class CustomerPanel(wx.Panel):
         if val == wx.ID_OK:
             self.edit_win.update()
             wx.MessageBox(u"修改成功！", "通知")
-        self.grid.GetTable().data[selected] = self.edit_win.get_data()
         self.edit_win.Destroy()
-        self.grid.Refresh()
+        self.grid.GetTable().data = self.service.search_customer()
+        self.grid.reset()
 
     """
     删除
@@ -74,13 +80,12 @@ class CustomerPanel(wx.Panel):
             wx.MessageBox(u"请选择要删除的数据！", "警告")
             return False
 
-        # wx.Confir
-
         selected = rows[0]
-        old_data = self.grid.GetTable().data
-        new_data = old_data[0:selected-1] + old_data[selected:]
-        self.grid.GetTable().data = new_data
-        self.grid.Refresh()
+        select_data = self.grid.GetTable().data[selected]
+        self.service.delete_customer(select_data[5])
+
+        self.grid.GetTable().data = self.service.search_customer()
+        self.grid.reset()
 
 
 class CustomerDataTable(gridlib.GridTableBase):
@@ -98,6 +103,8 @@ class CustomerDataTable(gridlib.GridTableBase):
             gridlib.GRID_VALUE_STRING
         ]
         self.data = service.CrmService.search_customer()
+        self._rows = self.GetNumberRows()
+        self._cols = self.GetNumberCols()
 
     # required methods for the wxPyGridTableBase interface
     def GetNumberRows(self):
@@ -124,6 +131,30 @@ class CustomerDataTable(gridlib.GridTableBase):
     def GetColLabelValue(self, col):
         return self.colLabels[col]
 
+    def reset_view(self, grid):
+        grid.BeginBatch()
+
+        for current, new, del_msg, add_msg in [
+            (self._rows, self.GetNumberRows(), gridlib.GRIDTABLE_NOTIFY_ROWS_DELETED, gridlib.GRIDTABLE_NOTIFY_ROWS_APPENDED),
+            (self._cols, self.GetNumberCols(), gridlib.GRIDTABLE_NOTIFY_COLS_DELETED, gridlib.GRIDTABLE_NOTIFY_COLS_APPENDED),
+        ]:
+            if new < current:
+                msg = gridlib.GridTableMessage(self, del_msg, new, current-new)
+                grid.ProcessTableMessage(msg)
+            elif new > current:
+                msg = gridlib.GridTableMessage(self, add_msg, new-current)
+                grid.ProcessTableMessage(msg)
+                msg = gridlib.GridTableMessage(self, gridlib.GRIDTABLE_REQUEST_VIEW_GET_VALUES)
+                grid.ProcessTableMessage(msg)
+
+        grid.EndBatch()
+
+        self._rows = self.GetNumberRows()
+        self._cols = self.GetNumberCols()
+
+        grid.AdjustScrollbars()
+        grid.ForceRefresh()
+
 
 class CustomerGrid(gridlib.Grid):
     """
@@ -134,7 +165,8 @@ class CustomerGrid(gridlib.Grid):
 
         self.selected = None
 
-        self.SetTable(CustomerDataTable(), True)
+        self._table = CustomerDataTable()
+        self.SetTable(self._table, True)
 
         self.AutoSize()
         self.CanDragGridSize()
@@ -144,6 +176,9 @@ class CustomerGrid(gridlib.Grid):
         self.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
 
         # self.Bind(gridlib.EVT_GRID_LABEL_LEFT_CLICK, self.OnLabelLeftClick)
+
+    def reset(self):
+        self._table.reset_view(self)
 
     def OnLabelLeftClick(self, evt):
         self.selected = evt.GetRow()

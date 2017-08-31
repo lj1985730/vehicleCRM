@@ -49,8 +49,8 @@ class CrmService:
         # 数据库对象
         db = sqlite.Database()
         # # 操作语句
-        sql = "INSERT INTO T_CUSTOMER(ID, NAME, GENDER, PHONE, ADDRESS, REMARK, MODIFY_TIME, MODIFIER) " \
-              "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?);"
+        sql = "INSERT INTO T_CUSTOMER(ID, NAME, GENDER, PHONE, ADDRESS, REMARK, DELETED, MODIFY_TIME, MODIFIER) " \
+              "VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?);"
         # # 数据集合
         data = (get_uuid(),) + customer + (get_now(), auth.Auth.logon_user)
         # # 执行数据库操作
