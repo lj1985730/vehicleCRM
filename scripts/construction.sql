@@ -23,8 +23,8 @@ CREATE TABLE T_VEHICLE (
 
   LOAN_PRODUCT          TEXT NOT NULL,                --贷款产品
   LOAN_PERIOD           TEXT NOT NULL,                --贷款期次
-  LOAN_TERM             TEXT NOT NULL,                --贷款年限
-  LOAN_VALUE            TEXT,                         --贷款金额
+  LOAN_TERM             INTEGER NOT NULL,             --贷款年限
+  LOAN_VALUE            NUMERIC,                        --贷款金额
   LOAN_REPORT_DATE      TEXT,                         --贷款提报日期
   LOAN_PASSED_DATE      TEXT,                         --贷款通过日期
   LOAN_DATE             TEXT NOT NULL,                --放款日期
