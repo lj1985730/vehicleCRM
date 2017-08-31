@@ -90,7 +90,11 @@ class CrmService:
 
     '''
     查询客户
-    @:return 车辆信息元组(名称，性别，地址，电话, 备注)
+    @:return 车辆信息元组(客户名称，型号，车辆登记日期，里程数，过户次数
+        贷款产品，贷款期次，贷款年限，贷款金额，贷款提报日期，贷款通过日期，放款日期，
+        承保公司，险种，保险生效日期，保险到期日期，
+        备注，修改人，修改时间，车辆信息ID，客户ID)
+        )
     '''
     @staticmethod
     def search_vehicle(customer_id):
@@ -101,12 +105,12 @@ class CrmService:
               "A.LOAN_PRODUCT, A.LOAN_PERIOD, A.LOAN_TERM, A.LOAN_VALUE, A.LOAN_REPORT_DATE, " \
               "A.LOAN_PASSED_DATE, A.LOAN_DATE, " \
               "A.INSURANCE_COMPANY, A.INSURANCE_TYPE, A.INSURANCE_START_DATE, A.INSURANCE_END_DATE, " \
-              "A.REMARK, C.NAME, A.MODIFY_TIME, A.ID " \
+              "A.REMARK, C.NAME, A.MODIFY_TIME, A.ID, B.ID " \
               "FROM T_VEHICLE A, T_CUSTOMER B, T_ACCOUNT C " \
               "WHERE A.CUSTOMER_ID = B.ID AND A.MODIFIER = C.ID AND A.DELETED = 0 AND B.DELETED = 0;"
 
         if customer_id is not None:
-            sql = sql + " AND CUSTOMER_ID = ?"
+            sql = sql + " AND A.CUSTOMER_ID = ?"
 
         # # 执行数据库操作
         return db.execute_query(sql, customer_id)

@@ -1,10 +1,12 @@
 # coding=utf-8
 import wx
+import wx.adv
 import wx.xrc
 from crm import service, textvalidator
+from wx.lib import intctrl
 
 
-# Class CustomerWin
+# Class VehicleWin
 class VehicleWin(wx.Dialog):
     def __init__(self, parent):
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title=u" 编辑车辆信息", pos=wx.DefaultPosition, size=wx.DefaultSize,
@@ -14,66 +16,179 @@ class VehicleWin(wx.Dialog):
 
         border = wx.BoxSizer(wx.VERTICAL)
 
-        # 姓名
-        box = wx.BoxSizer(wx.HORIZONTAL)
+        # load customer combo data
+        customer_data = service.CrmService.search_customer()
+        combo_data = []
+        for name, gender, phone, address, remark, customer_id in customer_data:
+            combo_data.append((customer_id, name))
 
-        label = wx.StaticText(self, wx.ID_ANY, u"* 姓名：")
+        # 客户姓名
+        box = wx.BoxSizer(wx.HORIZONTAL)
+        label = wx.StaticText(self, wx.ID_ANY, u"* 客户姓名：")
         label.SetForegroundColour(wx.RED)
         box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
-
-        self.customerNameInput = wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1),
-                                             validator=textvalidator.TextValidator())
-        box.Add(self.customerNameInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
-
+        self.customerCombobox =\
+            wx.ComboBox(self, wx.ID_ANY, "", size=wx.Size(200, -1), choices=combo_data, style=wx.CB_DROPDOWN)
+        box.Add(self.customerCombobox, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
         border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
-        # 性别
+        # 车辆型号
         box = wx.BoxSizer(wx.HORIZONTAL)
-
-        label = wx.StaticText(self, wx.ID_ANY, u"  性别：")
+        label = wx.StaticText(self, wx.ID_ANY, u"*车辆型号：")
+        label.SetForegroundColour(wx.RED)
         box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
-
-        self.customerGender1 = wx.RadioButton(self, wx.ID_ANY, u"男", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-        self.customerGender1.SetValue(True)
-        box.Add(self.customerGender1, 1, wx.ALIGN_CENTER | wx.ALL | wx.EXPAND, 5)
-        self.customerGender2 = wx.RadioButton(self, wx.ID_ANY, u"女", wx.DefaultPosition, wx.DefaultSize, 0)
-        box.Add(self.customerGender2, 1, wx.ALIGN_CENTER | wx.ALL | wx.EXPAND, 5)
-
+        self.vehicleModelInput =\
+            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1), validator=textvalidator.TextValidator())
+        box.Add(self.vehicleModelInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
         border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
-        # 电话
+        # 车辆登记日期
         box = wx.BoxSizer(wx.HORIZONTAL)
-
-        label = wx.StaticText(self, wx.ID_ANY, u"* 电话：")
-        label.SetForegroundColour(wx.Colour(255, 0, 0))
+        label = wx.StaticText(self, wx.ID_ANY, u"*车辆登记日期：")
+        label.SetForegroundColour(wx.RED)
         box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
-
-        self.customerPhoneInput = wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1),
-                                              validator=textvalidator.TextValidator())
-        box.Add(self.customerPhoneInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
-
+        self.vehicleRegDate =\
+            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(200, -1),
+                                  style=wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY,
+                                  validator=textvalidator.TextValidator())
+        box.Add(self.vehicleRegDate, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
         border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
-        # 地址
+        # 里程数
         box = wx.BoxSizer(wx.HORIZONTAL)
-
-        label = wx.StaticText(self, wx.ID_ANY, u"  地址：")
+        label = wx.StaticText(self, wx.ID_ANY, u"  里程数：")
         box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+        self.mileageInput =\
+            intctrl.IntCtrl(self, wx.ID_ANY, size=wx.Size(200, -1), validator=textvalidator.TextValidator())
+        box.Add(self.mileageInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+        border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
-        self.customerAddressInput = wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1))
-        box.Add(self.customerAddressInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+        # 过户次数
+        box = wx.BoxSizer(wx.HORIZONTAL)
+        label = wx.StaticText(self, wx.ID_ANY, u"*过户次数：")
+        label.SetForegroundColour(wx.RED)
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+        self.transCountInput =\
+            intctrl.IntCtrl(self, wx.ID_ANY, 1, size=wx.Size(200, -1), validator=textvalidator.TextValidator())
+        box.Add(self.transCountInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+        border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
+        # 贷款产品、期次
+        box = wx.BoxSizer(wx.HORIZONTAL)
+        label = wx.StaticText(self, wx.ID_ANY, u"*贷款产品：")
+        label.SetForegroundColour(wx.RED)
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+        self.loanProductInput =\
+            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1), validator=textvalidator.TextValidator())
+        box.Add(self.loanProductInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+        label = wx.StaticText(self, wx.ID_ANY, u"*期次：")
+        label.SetForegroundColour(wx.RED)
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+        self.loanPeriodInput =\
+            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1), validator=textvalidator.TextValidator())
+        box.Add(self.loanPeriodInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+        border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        # 贷款年限
+        box = wx.BoxSizer(wx.HORIZONTAL)
+        label = wx.StaticText(self, wx.ID_ANY, u"*贷款年限：")
+        label.SetForegroundColour(wx.RED)
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+        self.loanTermInput =\
+            intctrl.IntCtrl(self, wx.ID_ANY, 1, size=wx.Size(200, -1), validator=textvalidator.TextValidator())
+        box.Add(self.loanTermInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+        border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        # 贷款金额
+        box = wx.BoxSizer(wx.HORIZONTAL)
+        label = wx.StaticText(self, wx.ID_ANY, u"贷款金额：")
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+        self.loanValueInput =\
+            intctrl.IntCtrl(self, wx.ID_ANY, 1, size=wx.Size(200, -1))
+        box.Add(self.loanValueInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+        border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        # 贷款提报日期
+        box = wx.BoxSizer(wx.HORIZONTAL)
+        label = wx.StaticText(self, wx.ID_ANY, u"贷款提报日期：")
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+        self.loanReportDate = \
+            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(200, -1),
+                                  style=wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY | wx.adv.DP_ALLOWNONE)
+        box.Add(self.loanReportDate, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+        border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        # 贷款通过日期
+        box = wx.BoxSizer(wx.HORIZONTAL)
+        label = wx.StaticText(self, wx.ID_ANY, u"贷款通过日期：")
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+        self.loanPassedDate = \
+            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(200, -1),
+                                  style=wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY | wx.adv.DP_ALLOWNONE)
+        box.Add(self.loanPassedDate, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+        border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        # 放款日期
+        box = wx.BoxSizer(wx.HORIZONTAL)
+        label = wx.StaticText(self, wx.ID_ANY, u"* 放款日期：")
+        label.SetForegroundColour(wx.RED)
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+        self.loanDate = \
+            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(200, -1),
+                                  style=wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY,
+                                  validator=textvalidator.TextValidator())
+        box.Add(self.loanDate, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+        border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        # 承保公司
+        box = wx.BoxSizer(wx.HORIZONTAL)
+        label = wx.StaticText(self, wx.ID_ANY, u"承保公司：")
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+        self.insuranceCompanyInput =\
+            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1))
+        box.Add(self.insuranceCompanyInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+        border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        # 险种
+        box = wx.BoxSizer(wx.HORIZONTAL)
+        label = wx.StaticText(self, wx.ID_ANY, u"险种：")
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+        self.insuranceTypeInput =\
+            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1))
+        box.Add(self.insuranceTypeInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+        border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        # 保险生效日期
+        box = wx.BoxSizer(wx.HORIZONTAL)
+        label = wx.StaticText(self, wx.ID_ANY, u"*保险生效日期：")
+        label.SetForegroundColour(wx.RED)
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+        self.insuranceStartDate = \
+            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(200, -1),
+                                  style=wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY,
+                                  validator=textvalidator.TextValidator())
+        box.Add(self.insuranceStartDate, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+        border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        # 保险到期日期
+        box = wx.BoxSizer(wx.HORIZONTAL)
+        label = wx.StaticText(self, wx.ID_ANY, u"*保险到期日期：")
+        label.SetForegroundColour(wx.RED)
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+        self.insuranceEndDate = \
+            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(200, -1),
+                                  style=wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY,
+                                  validator=textvalidator.TextValidator())
+        box.Add(self.insuranceEndDate, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
         border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
         # 备注
         box = wx.BoxSizer(wx.HORIZONTAL)
-
         label = wx.StaticText(self, wx.ID_ANY, u"  备注：")
         box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
-
-        self.customerRemarkInput = wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1), style=wx.TE_MULTILINE)
-        box.Add(self.customerRemarkInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
-
+        self.remarkInput =\
+            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1), style=wx.TE_MULTILINE)
+        box.Add(self.remarkInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
         border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
         line = wx.StaticLine(self, -1, size=wx.DefaultSize, style=wx.HORIZONTAL)
@@ -87,7 +202,7 @@ class VehicleWin(wx.Dialog):
         btn = wx.Button(self, wx.ID_CANCEL, u"取消")
         buttons.Add(btn)
         buttons.Realize()
-        border.Add(buttons, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
+        border.Add(buttons, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
         self.SetSizer(border)
         border.Fit(self)
@@ -95,6 +210,7 @@ class VehicleWin(wx.Dialog):
     """
     表单赋值
     """
+
     def set_data(self, data):
         self.data = data
         self.customerNameInput.SetValue(self.data[0])
@@ -109,6 +225,7 @@ class VehicleWin(wx.Dialog):
     """
     表单取值
     """
+
     def get_form_values(self, transfer):
         if transfer:
             gender = '女'
@@ -129,13 +246,15 @@ class VehicleWin(wx.Dialog):
     """
     取值
     """
+
     def get_data(self):
-        customer = self.get_form_values(True)
-        return customer + (self.data[5],)
+        vehicle = self.get_form_values(True)
+        return vehicle + (self.data[19],)
 
     """
     保存
     """
+
     def save(self):
         customer = self.get_form_values(False)
         service.CrmService.save_customer(customer)
@@ -143,6 +262,7 @@ class VehicleWin(wx.Dialog):
     """
     更新
     """
+
     def update(self):
         customer = self.get_form_values(False)
         service.CrmService.update_customer(self.data[5], customer)

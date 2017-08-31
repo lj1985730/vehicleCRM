@@ -10,11 +10,16 @@ class CustomerPanel(wx.Panel):
     """
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-
         self.service = service.CrmService()
-
-        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.grid = None
         self.edit_win = None
+        self.init_layout()
+
+    """
+    展现渲染
+    """
+    def init_layout(self):
+        sizer = wx.BoxSizer(wx.VERTICAL)
         opt_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         create_btn = wx.Button(self, wx.ID_ANY, u"新增")
@@ -131,12 +136,17 @@ class CustomerDataTable(gridlib.GridTableBase):
     def GetColLabelValue(self, col):
         return self.colLabels[col]
 
+    """
+    视图重置
+    """
     def reset_view(self, grid):
         grid.BeginBatch()
 
         for current, new, del_msg, add_msg in [
-            (self._rows, self.GetNumberRows(), gridlib.GRIDTABLE_NOTIFY_ROWS_DELETED, gridlib.GRIDTABLE_NOTIFY_ROWS_APPENDED),
-            (self._cols, self.GetNumberCols(), gridlib.GRIDTABLE_NOTIFY_COLS_DELETED, gridlib.GRIDTABLE_NOTIFY_COLS_APPENDED),
+            (self._rows, self.GetNumberRows(), gridlib.GRIDTABLE_NOTIFY_ROWS_DELETED,
+             gridlib.GRIDTABLE_NOTIFY_ROWS_APPENDED),
+            (self._cols, self.GetNumberCols(), gridlib.GRIDTABLE_NOTIFY_COLS_DELETED,
+             gridlib.GRIDTABLE_NOTIFY_COLS_APPENDED),
         ]:
             if new < current:
                 msg = gridlib.GridTableMessage(self, del_msg, new, current-new)
@@ -177,6 +187,9 @@ class CustomerGrid(gridlib.Grid):
 
         # self.Bind(gridlib.EVT_GRID_LABEL_LEFT_CLICK, self.OnLabelLeftClick)
 
+    """
+    重置网格
+    """
     def reset(self):
         self._table.reset_view(self)
 
