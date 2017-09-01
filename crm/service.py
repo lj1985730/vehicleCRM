@@ -107,10 +107,10 @@ class CrmService:
               "D.VALUE, A.INSURANCE_TYPE, A.INSURANCE_START_DATE, A.INSURANCE_END_DATE, " \
               "A.REMARK, C.NAME, A.MODIFY_TIME, A.ID, B.ID, C.ID, D.ID " \
               "FROM T_VEHICLE A " \
-              "LEFT JOIN T_CUSTOMER B ON A.CUSTOMER_ID = B.ID " \
+              "LEFT JOIN T_CUSTOMER B ON A.CUSTOMER_ID = B.ID AND B.DELETED = 0 " \
               "LEFT JOIN T_ACCOUNT C ON A.MODIFIER = C.ID " \
-              "LEFT JOIN T_DICT D ON A.INSURANCE_COMPANY = D.ID " \
-              "WHERE A.DELETED = 0 AND B.DELETED = 0 AND D.TYPE = 1;"
+              "LEFT JOIN T_DICT D ON A.INSURANCE_COMPANY = D.ID AND D.TYPE = 1 " \
+              "WHERE A.DELETED = 0;"
 
         param_id = None
 

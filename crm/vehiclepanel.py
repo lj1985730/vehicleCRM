@@ -89,7 +89,7 @@ class VehiclePanel(wx.Panel):
 
         selected = rows[0]
         select_data = self.grid.GetTable().data[selected]
-        self.service.delete_customer(select_data[19])
+        self.service.delete_vehicle(select_data[19])
 
         self.grid.GetTable().data = self.service.search_vehicle(None)
         self.grid.reset()
