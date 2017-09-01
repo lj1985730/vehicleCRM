@@ -4,18 +4,19 @@ import wx
 
 class TextValidator(wx.Validator):
 
-    def __init__(self):
+    def __init__(self, title):
+        self.title = title
         wx.Validator.__init__(self)
 
     def Clone(self):
-        return TextValidator()
+        return TextValidator(self.title)
 
     def Validate(self, win):
         text_ctrl = self.GetWindow()
         text = text_ctrl.GetValue()
 
         if len(text.strip()) == 0:
-            wx.MessageBox("请输入必填信息!", "Error")
+            wx.MessageBox("请输入“" + self.title + "”！", "Error")
             text_ctrl.SetBackgroundColour("pink")
             text_ctrl.SetFocus()
             text_ctrl.Refresh()

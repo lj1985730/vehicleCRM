@@ -90,7 +90,7 @@ class CrmService:
 
     '''
     查询客户
-    @:return 车辆信息元组(客户名称，型号，车辆登记日期，里程数，过户次数
+    @:return 车辆信息元组(客户名称，型号，车辆登记日期，公里数，过户次数
         贷款产品，贷款期次，贷款年限，贷款金额，贷款提报日期，贷款通过日期，放款日期，
         承保公司，险种，保险生效日期，保险到期日期，
         备注，修改人，修改时间，车辆信息ID，客户ID)
@@ -104,34 +104,39 @@ class CrmService:
         sql = "SELECT B.NAME, A.MODEL, A.REG_DATE, A.MILEAGE, A.TRANSFER_COUNT, " \
               "A.LOAN_PRODUCT, A.LOAN_PERIOD, A.LOAN_TERM, A.LOAN_VALUE, A.LOAN_REPORT_DATE, " \
               "A.LOAN_PASSED_DATE, A.LOAN_DATE, " \
-              "A.INSURANCE_COMPANY, A.INSURANCE_TYPE, A.INSURANCE_START_DATE, A.INSURANCE_END_DATE, " \
-              "A.REMARK, C.NAME, A.MODIFY_TIME, A.ID, B.ID " \
-              "FROM T_VEHICLE A, T_CUSTOMER B, T_ACCOUNT C " \
-              "WHERE A.CUSTOMER_ID = B.ID AND A.MODIFIER = C.ID AND A.DELETED = 0 AND B.DELETED = 0;"
+              "D.VALUE, A.INSURANCE_TYPE, A.INSURANCE_START_DATE, A.INSURANCE_END_DATE, " \
+              "A.REMARK, C.NAME, A.MODIFY_TIME, A.ID, B.ID, C.ID, D.ID " \
+              "FROM T_VEHICLE A " \
+              "LEFT JOIN T_CUSTOMER B ON A.CUSTOMER_ID = B.ID " \
+              "LEFT JOIN T_ACCOUNT C ON A.MODIFIER = C.ID " \
+              "LEFT JOIN T_DICT D ON A.INSURANCE_COMPANY = D.ID " \
+              "WHERE A.DELETED = 0 AND B.DELETED = 0 AND D.TYPE = 1;"
+
+        param_id = None
 
         if customer_id is not None:
             sql = sql + " AND A.CUSTOMER_ID = ?"
+            param_id = (customer_id,)
 
         # # 执行数据库操作
-        return db.execute_query(sql, customer_id)
+        return db.execute_query(sql, param_id)
 
     '''
     新增车辆
     @vehicle 车辆信息元组(
-        型号，车辆登记日期，里程数，过户次数，
+        客户ID，型号，车辆登记日期，公里数，过户次数，
         贷款产品，贷款期次，贷款年限，贷款金额，贷款提报日期，贷款通过日期，放款日期，
         承保公司，险种，保险生效日期，保险到期日期，
         备注)
-    @customer_id 客户信息
     '''
     @staticmethod
-    def save_vehicle(vehicle, customer_id):
+    def save_vehicle(vehicle):
         # 数据库对象
         db = sqlite.Database()
         # 操作语句
-        sql = "INSERT INTO T_VEHICLE VALUES (?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,  ?, 0, ?);"
+        sql = "INSERT INTO T_VEHICLE VALUES (?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,  ?, 0, ?);"
         # 数据集合
-        data = (get_uuid(), customer_id) + vehicle + (get_now(), auth.Auth.logon_user)
+        data = (get_uuid(),) + vehicle + (get_now(), auth.Auth.logon_user)
         # 执行数据库操作
         db.execute_update(sql, data)
 
@@ -139,7 +144,7 @@ class CrmService:
     更新车辆
     @data_id 车辆ID
     @vehicle 车辆信息元组(
-        客户ID，型号，车辆登记日期，里程数，过户次数，
+        客户ID，型号，车辆登记日期，公里数，过户次数，
         贷款产品，贷款期次，贷款年限，贷款金额，贷款提报日期，贷款通过日期，放款日期，
         承保公司，险种，保险生效日期，保险到期日期，
         备注)
@@ -255,3 +260,20 @@ class CrmService:
         data = (threshold_day.strftime('%Y-%m-%d'),)
         # 执行数据库操作
         return db.execute_query(sql, data)
+
+    '''
+    获取字典列表
+    @dic_type 字典类型
+    '''
+    @staticmethod
+    def search_dict(dic_type):
+        # 数据库对象
+        db = sqlite.Database()
+        # 操作语句
+        sql = "SELECT ID, VALUE" \
+              " FROM T_DICT" \
+              " WHERE DELETED = 0 AND TYPE = ?" \
+              " ORDER BY SORT ASC;"
+
+        # 执行数据库操作
+        return db.execute_query(sql, (dic_type,))

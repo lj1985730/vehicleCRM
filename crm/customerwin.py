@@ -22,7 +22,7 @@ class CustomerWin(wx.Dialog):
         box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         self.customerNameInput = wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1),
-                                             validator=textvalidator.TextValidator())
+                                             validator=textvalidator.TextValidator(u"姓名"))
         box.Add(self.customerNameInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
@@ -49,7 +49,7 @@ class CustomerWin(wx.Dialog):
         box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         self.customerPhoneInput = wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1),
-                                              validator=textvalidator.TextValidator())
+                                              validator=textvalidator.TextValidator(u"电话"))
         box.Add(self.customerPhoneInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
@@ -87,7 +87,7 @@ class CustomerWin(wx.Dialog):
         btn = wx.Button(self, wx.ID_CANCEL, u"取消")
         buttons.Add(btn)
         buttons.Realize()
-        border.Add(buttons, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
+        border.Add(buttons, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
         self.SetSizer(border)
         border.Fit(self)

@@ -101,28 +101,30 @@ class VehicleDataTable(gridlib.GridTableBase):
     """
     def __init__(self):
         gridlib.GridTableBase.__init__(self)
-        self.colLabels = ['客户姓名', '车辆型号', '车辆登记日期', '里程数', '过户次数',
+        self.colLabels = ['客户姓名', '车辆型号', '车辆登记日期', '公里数', '过户次数',
                           '贷款产品', '贷款期次', '贷款年限', '贷款金额', '贷款提报日期', '贷款通过日期', '放款日期',
-                          '承保公司', '险种', '保险生效日期', '保险到期日期', '备注', '修改人', '修改时间']
+                          '承保公司', '险种', '保险生效日期', '保险到期日期',
+                          '备注', '修改人', '修改时间']
         self.dataTypes = [
             gridlib.GRID_VALUE_STRING,
             gridlib.GRID_VALUE_STRING,
-            gridlib.GRID_VALUE_STRING,
+            gridlib.GRID_VALUE_DATETIME,
             gridlib.GRID_VALUE_NUMBER,
             gridlib.GRID_VALUE_NUMBER,
 
             gridlib.GRID_VALUE_STRING,
             gridlib.GRID_VALUE_STRING,
             gridlib.GRID_VALUE_NUMBER,
-            gridlib.GRID_VALUE_FLOAT,
-            gridlib.GRID_VALUE_STRING,
-            gridlib.GRID_VALUE_STRING,
-            gridlib.GRID_VALUE_STRING,
+            gridlib.GRID_VALUE_NUMBER,
+            gridlib.GRID_VALUE_DATETIME,
+            gridlib.GRID_VALUE_DATETIME,
+            gridlib.GRID_VALUE_DATETIME,
 
             gridlib.GRID_VALUE_STRING,
             gridlib.GRID_VALUE_STRING,
-            gridlib.GRID_VALUE_STRING,
-            gridlib.GRID_VALUE_STRING,
+            gridlib.GRID_VALUE_DATETIME,
+            gridlib.GRID_VALUE_DATETIME,
+
             gridlib.GRID_VALUE_STRING,
             gridlib.GRID_VALUE_STRING,
             gridlib.GRID_VALUE_STRING

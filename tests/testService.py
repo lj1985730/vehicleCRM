@@ -1,5 +1,6 @@
 import unittest
 import sqlite3
+import datetime
 
 from crm import service
 
@@ -29,11 +30,12 @@ class TestService(unittest.TestCase):
     #     service.CrmService.delete_customer("A8FA37C0-87DD-11E7-A29E-A0C5898674EA")
 
     # 测试写入车辆信息
-    # def testSaveVehicle(self):
-    #     vehicle = ("本田思域", "2010-03-08", 50000, 0, "产品1", "1期",
-    #                10, 153800.5, "2010-03-01", "2010-03-03", "2010-03-05",
-    #                1, "车贷险", "2010-03-10", "2011-03-09", "测试数据")
-    #     service.CrmService.save_vehicle(vehicle, "A8FA37C0-87DD-11E7-A29E-A0C5898674EA")
+    def testSaveVehicle(self):
+        vehicle = ("A8FA37C0-87DD-11E7-A29E-A0C5898674EA",
+                   "本田思域", datetime.datetime.strptime("2010-03-10", "%Y-%m-%d"), 50000, 0,
+                   "产品1", "1期", 10, 200000, "2010-03-01", "2010-03-03", "2010-03-05",
+                   "6EC50A8C-8ED5-11E7-A955-A0C5898674EA", "车贷险", "2010-03-10", "2011-03-09", "测试数据")
+        service.CrmService.save_vehicle(vehicle)
 
         # 测试写入车辆信息
     # def testUpdateVehicle(self):
@@ -47,11 +49,11 @@ class TestService(unittest.TestCase):
     #     service.CrmService.delete_vehicle("6C7AD07A-87E4-11E7-A201-A0C5898674EA")
 
     # 测试获取报警
-    def testSearchAlarm(self):
-        result = service.CrmService.search_alarm(30)
-        print(len(result))
-        for data in result:
-            print(data)
+    # def testSearchAlarm(self):
+    #     result = service.CrmService.search_alarm(30)
+    #     print(len(result))
+    #     for data in result:
+    #         print(data)
 
 
 if __name__ == '__main__':
