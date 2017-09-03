@@ -244,14 +244,17 @@ class CrmService:
         # 数据库对象
         db = sqlite.Database()
         # 操作语句
-        sql = "SELECT A.ID, A.CUSTOMER_ID, A.MODEL, A.REG_DATE, A.MILEAGE, A.TRANSFER_COUNT, " \
-              "A.LOAN_PRODUCT, A.LOAN_PERIOD, A.LOAN_TERM, A.LOAN_VALUE, A.LOAN_REPORT_DATE, A.LOAN_PASSED_DATE, " \
-              "A.LOAN_DATE, A.INSURANCE_COMPANY, A.INSURANCE_TYPE, A.INSURANCE_START_DATE, A.INSURANCE_END_DATE, " \
-              "A.REMARK, A.MODIFY_TIME, " \
-              "B.NAME AS CUSTOMER_NAME, B.GENDER, B.PHONE, B.ADDRESS" \
-              " FROM T_VEHICLE A, T_CUSTOMER B" \
-              " WHERE A.DELETED = 0 AND B.DELETED = 0 AND A.CUSTOMER_ID = B.ID" \
-              " AND A.INSURANCE_END_DATE <= ?;"
+        sql = "SELECT B.NAME, CASE WHEN GENDER = 1 THEN '男' ELSE '女' END AS GENDER, " \
+              "B.PHONE, B.ADDRESS, A.MODEL, A.REG_DATE, A.MILEAGE, A.TRANSFER_COUNT, " \
+              "A.LOAN_PRODUCT, A.LOAN_PERIOD, A.LOAN_TERM, A.LOAN_VALUE, A.LOAN_REPORT_DATE, " \
+              "A.LOAN_PASSED_DATE, A.LOAN_DATE, " \
+              "D.VALUE, A.INSURANCE_TYPE, A.INSURANCE_START_DATE, A.INSURANCE_END_DATE, " \
+              "A.REMARK, C.NAME, A.MODIFY_TIME, A.ID, B.ID, C.ID, D.ID " \
+              "FROM T_VEHICLE A " \
+              "LEFT JOIN T_CUSTOMER B ON A.CUSTOMER_ID = B.ID AND B.DELETED = 0 " \
+              "LEFT JOIN T_ACCOUNT C ON A.MODIFIER = C.ID " \
+              "LEFT JOIN T_DICT D ON A.INSURANCE_COMPANY = D.ID AND D.TYPE = 1 " \
+              " WHERE A.INSURANCE_END_DATE <= ?;"
 
         today = datetime.date.today()
         threshold_day = today + datetime.timedelta(days=alarm_day_count)

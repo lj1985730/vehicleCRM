@@ -1,5 +1,6 @@
 # coding=utf-8
 from crm import sqlite
+import uuid
 
 
 class Auth:
@@ -27,6 +28,8 @@ class Auth:
             return False
         else:
             cls.logon_user = result[0]
+            if cls.logon_user[2] == 0:
+                cls.register()
             return True
 
     @classmethod
@@ -36,3 +39,23 @@ class Auth:
     @classmethod
     def get_logon_account(cls):
         return cls.logon_user
+
+    '''
+    激活
+    '''
+    @classmethod
+    def register(cls):
+        # 数据库对象
+        db = sqlite.Database()
+        sql = "INSERT INTO T_DICT VALUES (?,0,1,0,0)"
+        db.execute_update(sql, (str(uuid.uuid1()).upper(),))
+
+    '''
+    判断激活
+    '''
+    @classmethod
+    def registered(cls):
+        # 数据库对象
+        db = sqlite.Database()
+        sql = "SELECT 1 FROM T_DICT WHERE TYPE = 0 AND VALUE = 1"
+        return db.execute_query(sql, None)

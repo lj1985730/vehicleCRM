@@ -5,7 +5,7 @@ import wx.adv
 import wx.xrc
 from wx.lib import intctrl
 
-from crm import service, textvalidator
+from crm import service, textvalidator, auth
 
 
 # Class VehicleWin
@@ -23,6 +23,9 @@ class VehicleWin(wx.Dialog):
 
         # load insurance company combo data
         self.company_data = service.CrmService.search_dict(1)
+
+        # load authorization
+        self.current_user = auth.Auth.logon_user
 
         # new box -------------------------------------------------------------------------
         box = wx.StaticBox(self, -1, u"客户信息")
@@ -265,6 +268,22 @@ class VehicleWin(wx.Dialog):
 
         self.SetSizer(border)
         border.Fit(self)
+
+    '''
+    权限控制
+    '''
+    def auth_control(self):
+        if self.current_user[2] == 2:
+            self.customerCombobox.Disable()
+            self.vehicleModelInput.Disable()
+            self.vehicleRegDate.Disable()
+            self.transCountInput.Disable()
+            self.loanProductInput.Disable()
+            self.loanPeriodInput.Disable()
+            self.loanTermInput.Disable()
+            self.loanDate.Disable()
+            self.insuranceStartDate.Disable()
+            self.insuranceEndDate.Disable()
 
     '''
     选择客户触发

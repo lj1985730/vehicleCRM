@@ -1,6 +1,6 @@
 # coding=utf-8
 import wx
-from crm import loginwin, auth, customerpanel, vehiclepanel
+from crm import loginwin, auth, customerpanel, vehiclepanel, service
 import wx.lib.agw.flatnotebook as fnb
 
 
@@ -89,6 +89,7 @@ class MainFrame(wx.Frame):
     账户登录
     '''
     def on_login(self, event):
+
         win = loginwin.LoginWin(self)
         win.CenterOnScreen()
 
@@ -96,6 +97,12 @@ class MainFrame(wx.Frame):
 
         if val == wx.ID_OK:
             win.do_login()
+
+            is_registered = auth.Auth.registered()
+            if is_registered is None or len(is_registered) == 0:
+                wx.MessageBox(u"请先激活系统！", u"警告")
+                return False
+
             self.toggle_menu()
 
         win.Destroy()

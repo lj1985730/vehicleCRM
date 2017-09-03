@@ -1,7 +1,7 @@
 # coding=utf-8
 import wx
 import wx.grid as gridlib
-from crm import service, vehiclewin
+from crm import service, vehiclewin, excelutil
 import datetime
 
 
@@ -23,6 +23,10 @@ class VehiclePanel(wx.Panel):
     def init_layout(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
         opt_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        export_btn = wx.Button(self, wx.ID_ANY, u"导出")
+        self.Bind(wx.EVT_BUTTON, self.on_export, export_btn)
+        opt_sizer.Add(export_btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
         create_btn = wx.Button(self, wx.ID_ANY, u"新增")
         self.Bind(wx.EVT_BUTTON, self.open_create, create_btn)
@@ -69,6 +73,7 @@ class VehiclePanel(wx.Panel):
         select_data = self.grid.GetTable().data[selected]
         self.edit_win = vehiclewin.VehicleWin(self)
         self.edit_win.set_data(select_data)
+        self.edit_win.auth_control()    # 权限控制
         self.edit_win.CenterOnScreen()
         val = self.edit_win.ShowModal()
         if val == wx.ID_OK:
@@ -93,6 +98,12 @@ class VehiclePanel(wx.Panel):
 
         self.grid.GetTable().data = self.service.search_vehicle(None)
         self.grid.reset()
+
+    """
+    删除
+    """
+    def on_export(self, event):
+        excelutil.ExcelUtil.export_vehicle((u"车辆预警", u"车辆信息", 30))
 
 
 class VehicleDataTable(gridlib.GridTableBase):
