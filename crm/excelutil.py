@@ -1,6 +1,7 @@
 # coding=utf-8
 from crm import service
 import xlwt
+import os
 
 
 class ExcelUtil:
@@ -10,9 +11,14 @@ class ExcelUtil:
 
     @staticmethod
     def export_vehicle(query):
+
+        data = service.CrmService.search_vehicle(query[2])
+
+        if len(data) == 0:
+            return False
+
         workbook = xlwt.Workbook()
         sheet = workbook.add_sheet(query[0], cell_overwrite_ok=True)
-        data = service.CrmService.search_alarm(query[2])
 
         sheet.write_merge(0, 0, 0, 18, query[1])
 
@@ -39,14 +45,14 @@ class ExcelUtil:
         sheet.write(1, 17, u"保险到期日期")
         sheet.write(1, 18, u"备注")
 
-        if len(data) > 0:
-            for index in range(data):
-                vehicle = data[index]
-                for c in range(0, 18):
-                    sheet.write(index, c, vehicle[c])
+        for index in range(len(data)):
+            vehicle = data[index]
+            for c in range(0, 18):
+                sheet.write(index, c, vehicle[c])
 
-        workbook.save(r"..\\%s.xls" % query[0])
+        export_path = r"..\export"
+        if not os.path.exists(export_path):
+            os.makedirs(export_path)
 
-
-
-
+        workbook.save((export_path + "\%s.xls") % query[0])
+        return True

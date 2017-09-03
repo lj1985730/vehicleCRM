@@ -49,4 +49,6 @@ class LoginWin(wx.Dialog):
         sizer.Fit(self)
 
     def do_login(self):
-        return auth.Auth.login(self.loginNameInput.GetValue(), self.loginPassInput.GetValue())
+        login_result = auth.Auth.login(self.loginNameInput.GetValue(), self.loginPassInput.GetValue())
+        if not login_result:
+            wx.MessageBox(u"用户名或密码错误！", u"错误", style=wx.ICON_ERROR)

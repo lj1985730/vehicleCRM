@@ -50,7 +50,7 @@ class TestService(unittest.TestCase):
 
     # 测试获取报警
     # def testSearchAlarm(self):
-    #     result = service.CrmService.search_alarm(30)
+    #     result = service.CrmService.search_vehicle(30)
     #     print(len(result))
     #     for data in result:
     #         print(data)

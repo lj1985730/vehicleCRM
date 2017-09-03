@@ -89,19 +89,22 @@ class CrmService:
         db.execute_update(sql, data)
 
     '''
-    查询客户
-    @:return 车辆信息元组(客户名称，型号，车辆登记日期，公里数，过户次数
+    获取需要报警的车辆信息
+    @alarm_day_count 提前报警天数
+    @:return List[
+        客户名称，客户性别，电话，
+        车辆型号，车辆登记日期，公里数，过户次数
         贷款产品，贷款期次，贷款年限，贷款金额，贷款提报日期，贷款通过日期，放款日期，
         承保公司，险种，保险生效日期，保险到期日期，
-        备注，修改人，修改时间，车辆信息ID，客户ID)
-        )
+        备注，修改人，修改时间，车辆信息ID，客户ID，账户ID，承保公司ID]
     '''
     @staticmethod
-    def search_vehicle(customer_id):
+    def search_vehicle(alarm_day_count):
         # 数据库对象
         db = sqlite.Database()
-        # # 操作语句
-        sql = "SELECT B.NAME, A.MODEL, A.REG_DATE, A.MILEAGE, A.TRANSFER_COUNT, " \
+        # 操作语句
+        sql = "SELECT B.NAME, CASE WHEN GENDER = 1 THEN '男' ELSE '女' END AS GENDER, B.PHONE, " \
+              "A.MODEL, A.REG_DATE, A.MILEAGE, A.TRANSFER_COUNT, " \
               "A.LOAN_PRODUCT, A.LOAN_PERIOD, A.LOAN_TERM, A.LOAN_VALUE, A.LOAN_REPORT_DATE, " \
               "A.LOAN_PASSED_DATE, A.LOAN_DATE, " \
               "D.VALUE, A.INSURANCE_TYPE, A.INSURANCE_START_DATE, A.INSURANCE_END_DATE, " \
@@ -110,23 +113,22 @@ class CrmService:
               "LEFT JOIN T_CUSTOMER B ON A.CUSTOMER_ID = B.ID AND B.DELETED = 0 " \
               "LEFT JOIN T_ACCOUNT C ON A.MODIFIER = C.ID " \
               "LEFT JOIN T_DICT D ON A.INSURANCE_COMPANY = D.ID AND D.TYPE = 1 " \
-              "WHERE A.DELETED = 0;"
+              " WHERE A.INSURANCE_END_DATE <= ? ORDER BY A.INSURANCE_END_DATE ASC;"
 
-        param_id = None
+        today = datetime.date.today()
+        threshold_day = today + datetime.timedelta(days=alarm_day_count)
 
-        if customer_id is not None:
-            sql = sql + " AND A.CUSTOMER_ID = ?"
-            param_id = (customer_id,)
-
-        # # 执行数据库操作
-        return db.execute_query(sql, param_id)
+        # 数据集合
+        data = (threshold_day.strftime('%Y-%m-%d'),)
+        # 执行数据库操作
+        return db.execute_query(sql, data)
 
     '''
     新增车辆
     @vehicle 车辆信息元组(
         客户ID，型号，车辆登记日期，公里数，过户次数，
         贷款产品，贷款期次，贷款年限，贷款金额，贷款提报日期，贷款通过日期，放款日期，
-        承保公司，险种，保险生效日期，保险到期日期，
+        承保公司ID，险种，保险生效日期，保险到期日期，
         备注)
     '''
     @staticmethod
@@ -146,7 +148,7 @@ class CrmService:
     @vehicle 车辆信息元组(
         客户ID，型号，车辆登记日期，公里数，过户次数，
         贷款产品，贷款期次，贷款年限，贷款金额，贷款提报日期，贷款通过日期，放款日期，
-        承保公司，险种，保险生效日期，保险到期日期，
+        承保公司ID，险种，保险生效日期，保险到期日期，
         备注)
     '''
     @staticmethod
@@ -234,35 +236,6 @@ class CrmService:
         data = (get_now(), auth.Auth.logon_user[0], data_id)
         # 执行数据库操作
         db.execute_update(sql, data)
-
-    '''
-    获取需要报警的车辆
-    @alarm_day_count 提前报警天数
-    '''
-    @staticmethod
-    def search_alarm(alarm_day_count):
-        # 数据库对象
-        db = sqlite.Database()
-        # 操作语句
-        sql = "SELECT B.NAME, CASE WHEN GENDER = 1 THEN '男' ELSE '女' END AS GENDER, " \
-              "B.PHONE, B.ADDRESS, A.MODEL, A.REG_DATE, A.MILEAGE, A.TRANSFER_COUNT, " \
-              "A.LOAN_PRODUCT, A.LOAN_PERIOD, A.LOAN_TERM, A.LOAN_VALUE, A.LOAN_REPORT_DATE, " \
-              "A.LOAN_PASSED_DATE, A.LOAN_DATE, " \
-              "D.VALUE, A.INSURANCE_TYPE, A.INSURANCE_START_DATE, A.INSURANCE_END_DATE, " \
-              "A.REMARK, C.NAME, A.MODIFY_TIME, A.ID, B.ID, C.ID, D.ID " \
-              "FROM T_VEHICLE A " \
-              "LEFT JOIN T_CUSTOMER B ON A.CUSTOMER_ID = B.ID AND B.DELETED = 0 " \
-              "LEFT JOIN T_ACCOUNT C ON A.MODIFIER = C.ID " \
-              "LEFT JOIN T_DICT D ON A.INSURANCE_COMPANY = D.ID AND D.TYPE = 1 " \
-              " WHERE A.INSURANCE_END_DATE <= ?;"
-
-        today = datetime.date.today()
-        threshold_day = today + datetime.timedelta(days=alarm_day_count)
-
-        # 数据集合
-        data = (threshold_day.strftime('%Y-%m-%d'),)
-        # 执行数据库操作
-        return db.execute_query(sql, data)
 
     '''
     获取字典列表

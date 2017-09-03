@@ -47,8 +47,8 @@ class Auth:
     def register(cls):
         # 数据库对象
         db = sqlite.Database()
-        sql = "INSERT INTO T_DICT VALUES (?,0,1,0,0)"
-        db.execute_update(sql, (str(uuid.uuid1()).upper(),))
+        sql = "UPDATE T_DICT SET VALUE = 1 WHERE TYPE = 0"
+        db.execute_update(sql, None)
 
     '''
     判断激活

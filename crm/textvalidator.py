@@ -16,7 +16,7 @@ class TextValidator(wx.Validator):
         text = text_ctrl.GetValue()
 
         if len(text.strip()) == 0:
-            wx.MessageBox("请输入“" + self.title + "”！", "Error")
+            wx.MessageBox("请输入“" + self.title + "”！", "提示", style=wx.ICON_HAND)
             text_ctrl.SetBackgroundColour("pink")
             text_ctrl.SetFocus()
             text_ctrl.Refresh()

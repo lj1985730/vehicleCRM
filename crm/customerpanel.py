@@ -50,7 +50,7 @@ class CustomerPanel(wx.Panel):
         val = self.edit_win.ShowModal()
         if val == wx.ID_OK:
             self.edit_win.save()
-            wx.MessageBox(u"保存成功！", "通知")
+            wx.MessageBox(u"保存成功！", "提示", style=wx.ICON_INFORMATION)
         self.edit_win.Destroy()
         self.grid.GetTable().data = self.service.search_customer()
         self.grid.reset()
@@ -61,7 +61,7 @@ class CustomerPanel(wx.Panel):
     def open_modify(self, event):
         rows = self.grid.GetSelectedRows()
         if rows is None or len(rows) == 0:
-            wx.MessageBox(u"请选择要修改的数据！", "警告")
+            wx.MessageBox(u"请选择要修改的数据！", "提示", style=wx.ICON_HAND)
             return False
         selected = rows[0]
         select_data = self.grid.GetTable().data[selected]
@@ -71,7 +71,7 @@ class CustomerPanel(wx.Panel):
         val = self.edit_win.ShowModal()
         if val == wx.ID_OK:
             self.edit_win.update()
-            wx.MessageBox(u"修改成功！", "通知")
+            wx.MessageBox(u"修改成功！", "提示", style=wx.ICON_INFORMATION)
         self.edit_win.Destroy()
         self.grid.GetTable().data = self.service.search_customer()
         self.grid.reset()
@@ -82,11 +82,18 @@ class CustomerPanel(wx.Panel):
     def on_delete(self, event):
         rows = self.grid.GetSelectedRows()
         if rows is None or len(rows) == 0:
-            wx.MessageBox(u"请选择要删除的数据！", "警告")
+            wx.MessageBox(u"请选择要删除的数据！", "提示", style=wx.ICON_HAND)
             return False
 
         selected = rows[0]
         select_data = self.grid.GetTable().data[selected]
+
+        dlg = wx.MessageDialog(self, u"是否确定删除数据？", "警告", style=wx.YES_NO | wx.NO_DEFAULT | wx.ICON_INFORMATION)
+        val = dlg.ShowModal()
+        if val == wx.ID_NO:
+            return False
+        dlg.Destroy()
+
         self.service.delete_customer(select_data[5])
 
         self.grid.GetTable().data = self.service.search_customer()

@@ -58,9 +58,8 @@ class MainFrame(wx.Frame):
     切换按钮权限
     '''
     def toggle_menu(self):
-        # self.customer_item.Enable(auth.Auth.logon_user is not None)
-        # self.vehicle_item.Enable(auth.Auth.logon_user is not None)
-        pass
+        self.customer_item.Enable(auth.Auth.logon_user is not None)
+        self.vehicle_item.Enable(auth.Auth.logon_user is not None)
 
     '''
     创建右键菜单
@@ -100,7 +99,7 @@ class MainFrame(wx.Frame):
 
             is_registered = auth.Auth.registered()
             if is_registered is None or len(is_registered) == 0:
-                wx.MessageBox(u"请先激活系统！", u"警告")
+                wx.MessageBox(u"请先激活系统！", u"警告", style=wx.ICON_AUTH_NEEDED)
                 return False
 
             self.toggle_menu()

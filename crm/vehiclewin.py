@@ -232,6 +232,7 @@ class VehicleWin(wx.Dialog):
             wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(200, -1),
                                   style=wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY)
         sizer.Add(self.insuranceStartDate, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+        self.Bind(wx.adv.EVT_DATE_CHANGED, self.get_end, self.insuranceStartDate)
 
         # 保险到期日期
         label = wx.StaticText(self, wx.ID_ANY, u"* 保险到期日期：", size=(95, -1), style=wx.ALIGN_RIGHT)
@@ -302,39 +303,37 @@ class VehicleWin(wx.Dialog):
 
         self.data = data
 
-        self.customerCombobox.SetValue(self.data[0])
+        if self.data[0] is not None:
+            self.customerCombobox.SetValue(self.data[0])
+            self.customerGenderPanel.SetLabelText(self.data[1])
+            self.customerPhonePanel.SetLabelText(self.data[2])
 
-        for customer in self.customer_data:
-            if customer[5] == self.data[20]:
-                self.customerGenderPanel.SetLabelText(customer[1])
-                self.customerPhonePanel.SetLabelText(customer[2])
+        self.vehicleModelInput.SetValue(self.data[3])
+        if self.data[4] is not None and self.data[4] != "":
+            self.vehicleRegDate.SetValue(self.parse_date(self.data[4]))
+        self.mileageInput.SetValue(self.data[5])
+        self.transCountInput.SetValue(self.data[6])
 
-        self.vehicleModelInput.SetValue(self.data[1])
-        if self.data[2] is not None and self.data[2] != "":
-            self.vehicleRegDate.SetValue(self.parse_date(self.data[2]))
-        self.mileageInput.SetValue(self.data[3])
-        self.transCountInput.SetValue(self.data[4])
-
-        self.loanProductInput.SetValue(self.data[5])
-        self.loanPeriodInput.SetValue(self.data[6])
-        self.loanTermInput.SetValue(self.data[7])
-        self.loanValueInput.SetValue(self.data[8])
-        if self.data[9] is not None and self.data[9] != "":
-            self.loanReportDate.SetValue(self.parse_date(self.data[9]))
-        if self.data[10] is not None and self.data[10] != "":
-            self.loanPassedDate.SetValue(self.parse_date(self.data[10]))
+        self.loanProductInput.SetValue(self.data[7])
+        self.loanPeriodInput.SetValue(self.data[8])
+        self.loanTermInput.SetValue(self.data[9])
+        self.loanValueInput.SetValue(self.data[10])
         if self.data[11] is not None and self.data[11] != "":
-            self.loanDate.SetValue(self.parse_date(self.data[11]))
+            self.loanReportDate.SetValue(self.parse_date(self.data[11]))
+        if self.data[12] is not None and self.data[12] != "":
+            self.loanPassedDate.SetValue(self.parse_date(self.data[12]))
+        if self.data[13] is not None and self.data[13] != "":
+            self.loanDate.SetValue(self.parse_date(self.data[13]))
 
-        if self.data[12] is not None:
-            self.insuranceCompanyCombobox.SetValue(self.data[12])
-        self.insuranceTypeInput.SetValue(self.data[13])
-        if self.data[14] is not None and self.data[14] != "":
-            self.insuranceStartDate.SetValue(self.parse_date(self.data[14]))
-        if self.data[15] is not None and self.data[15] != "":
-            self.insuranceEndDate.SetValue(self.parse_date(self.data[15]))
+        if self.data[14] is not None:
+            self.insuranceCompanyCombobox.SetValue(self.data[14])
+        self.insuranceTypeInput.SetValue(self.data[15])
+        if self.data[16] is not None and self.data[16] != "":
+            self.insuranceStartDate.SetValue(self.parse_date(self.data[16]))
+        if self.data[17] is not None and self.data[17] != "":
+            self.insuranceEndDate.SetValue(self.parse_date(self.data[17]))
 
-        self.remarkInput.SetValue(self.data[16])
+        self.remarkInput.SetValue(self.data[18])
 
     """
     表单取值
@@ -342,29 +341,29 @@ class VehicleWin(wx.Dialog):
     def get_form_values(self):
         form_values = ()
         if self.customerCombobox.GetSelection() == -1:
-            wx.MessageBox("请选择客户！")
+            wx.MessageBox("请选择客户！", "提示", style=wx.ICON_HAND)
             return False
         form_values = form_values + (self.customerCombobox.GetClientData(self.customerCombobox.GetSelection()),)
 
         if self.vehicleModelInput.GetValue().strip() == "":
-            wx.MessageBox("请输入车辆型号！")
+            wx.MessageBox("请输入车辆型号！", "提示", style=wx.ICON_HAND)
             return False
         form_values = form_values + (self.vehicleModelInput.GetValue().strip(),)
 
         if not self.vehicleRegDate.GetValue().IsValid():
-            wx.MessageBox("请输入车辆登记日期！")
+            wx.MessageBox("请输入车辆登记日期！", "提示", style=wx.ICON_HAND)
             return False
         form_values = form_values + (self.vehicleRegDate.GetValue().Format(format="%Y-%m-%d"),)
 
         form_values = form_values + (self.mileageInput.GetValue(), self.transCountInput.GetValue())
 
         if self.loanProductInput.GetValue().strip() == "":
-            wx.MessageBox("请输入贷款产品！")
+            wx.MessageBox("请输入贷款产品！", "提示", style=wx.ICON_HAND)
             return False
         form_values = form_values + (self.loanProductInput.GetValue().strip(),)
 
         if self.loanPeriodInput.GetValue().strip() == "":
-            wx.MessageBox("请输入期次！")
+            wx.MessageBox("请输入期次！", "提示", style=wx.ICON_HAND)
             return False
         form_values = form_values + (self.loanPeriodInput.GetValue().strip(),)
 
@@ -381,7 +380,7 @@ class VehicleWin(wx.Dialog):
             form_values = form_values + ("",)
 
         if not self.loanDate.GetValue().IsValid():
-            wx.MessageBox("请输入放款日期！")
+            wx.MessageBox("请输入放款日期！", "提示", style=wx.ICON_HAND)
             return False
         form_values = form_values + (self.loanDate.GetValue().Format(format="%Y-%m-%d"),)
 
@@ -394,12 +393,12 @@ class VehicleWin(wx.Dialog):
         form_values = form_values + (self.insuranceTypeInput.GetValue().strip(),)
 
         if not self.insuranceStartDate.GetValue().IsValid():
-            wx.MessageBox("请输入保险生效日期！")
+            wx.MessageBox("请输入保险生效日期！", "提示", style=wx.ICON_HAND)
             return False
         form_values = form_values + (self.insuranceStartDate.GetValue().Format(format="%Y-%m-%d"),)
 
         if not self.insuranceEndDate.GetValue().IsValid():
-            wx.MessageBox("请输入保险生效日期！")
+            wx.MessageBox("请输入保险到期日期！", "提示", style=wx.ICON_HAND)
             return False
         form_values = form_values + (self.insuranceEndDate.GetValue().Format(format="%Y-%m-%d"),)
 
@@ -412,7 +411,7 @@ class VehicleWin(wx.Dialog):
     """
     def get_data(self):
         vehicle = self.get_form_values()
-        return vehicle + (self.data[19],)
+        return vehicle + (self.data[21],)
 
     """
     保存
@@ -426,7 +425,7 @@ class VehicleWin(wx.Dialog):
     """
     def update(self):
         customer = self.get_form_values()
-        service.CrmService.update_vehicle(self.data[19], customer)
+        service.CrmService.update_vehicle(self.data[21], customer)
 
     '''
     时间字符串转wx.dateTime
@@ -435,3 +434,12 @@ class VehicleWin(wx.Dialog):
     def parse_date(date_str):
         dt = datetime.datetime.strptime(date_str, "%Y-%m-%d")
         return wx.pydate2wxdate(dt)
+
+    '''
+    计算保险到期日期
+    '''
+    def get_end(self, event):
+        start = event.GetDate()
+        span = wx.DateSpan(years=1, days=-1)
+        end = start.Add(span)
+        self.insuranceEndDate.SetValue(end)
