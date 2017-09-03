@@ -1,0 +1,1 @@
+pyinstaller -Fw crm/main.py --noconsole --icon icon.ico --clean

@@ -50,7 +50,7 @@ class ExcelUtil:
             for c in range(0, 18):
                 sheet.write(index, c, vehicle[c])
 
-        export_path = r"..\export"
+        export_path = r".\export"
         if not os.path.exists(export_path):
             os.makedirs(export_path)
 
