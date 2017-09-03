@@ -83,7 +83,6 @@ class MainFrame(wx.Frame):
     '''
     def on_exit(self, event):
         auth.Auth.logout()
-        print(auth.Auth.logon_user)
         self.Close(True)
 
     '''

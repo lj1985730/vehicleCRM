@@ -52,7 +52,7 @@ class CrmService:
         sql = "INSERT INTO T_CUSTOMER(ID, NAME, GENDER, PHONE, ADDRESS, REMARK, DELETED, MODIFY_TIME, MODIFIER) " \
               "VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?);"
         # # 数据集合
-        data = (get_uuid(),) + customer + (get_now(), auth.Auth.logon_user)
+        data = (get_uuid(),) + customer + (get_now(), auth.Auth.logon_user[0])
         # # 执行数据库操作
         db.execute_update(sql, data)
 
@@ -69,7 +69,7 @@ class CrmService:
         sql = "UPDATE T_CUSTOMER SET NAME = ?, GENDER = ?, PHONE = ?, ADDRESS = ?, REMARK = ?," \
               "MODIFY_TIME = ?, DELETED = 0, MODIFIER = ? WHERE ID = ?;"
         # 数据集合
-        data = customer + (get_now(), auth.Auth.logon_user, data_id)
+        data = customer + (get_now(), auth.Auth.logon_user[0], data_id)
         # 执行数据库操作
         db.execute_update(sql, data)
 
@@ -84,7 +84,7 @@ class CrmService:
         # 操作语句
         sql = "UPDATE T_CUSTOMER SET DELETED = 1, MODIFY_TIME = ?, MODIFIER = ? WHERE ID = ?;"
         # 数据集合
-        data = (get_now(), auth.Auth.logon_user, data_id)
+        data = (get_now(), auth.Auth.logon_user[0], data_id)
         # 执行数据库操作
         db.execute_update(sql, data)
 
@@ -136,7 +136,7 @@ class CrmService:
         # 操作语句
         sql = "INSERT INTO T_VEHICLE VALUES (?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,  ?, 0, ?);"
         # 数据集合
-        data = (get_uuid(),) + vehicle + (get_now(), auth.Auth.logon_user)
+        data = (get_uuid(),) + vehicle + (get_now(), auth.Auth.logon_user[0])
         # 执行数据库操作
         db.execute_update(sql, data)
 
@@ -212,7 +212,7 @@ class CrmService:
         # 固定内容
         sql = sql + ",MODIFY_TIME = ?, MODIFIER = ? WHERE ID = ?"
         data.append(get_now())
-        data.append(auth.Auth.logon_user)
+        data.append(auth.Auth.logon_user[0])
         data.append(data_id)
 
         # list转tuple
@@ -231,7 +231,7 @@ class CrmService:
         # 操作语句
         sql = "UPDATE T_VEHICLE SET DELETED = 1, MODIFY_TIME = ?, MODIFIER = ? WHERE ID = ?;"
         # 数据集合
-        data = (get_now(), auth.Auth.logon_user, data_id)
+        data = (get_now(), auth.Auth.logon_user[0], data_id)
         # 执行数据库操作
         db.execute_update(sql, data)
 

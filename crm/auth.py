@@ -16,7 +16,7 @@ class Auth:
         # 数据库对象
         db = sqlite.Database()
         # 操作语句
-        sql = "SELECT ID FROM T_ACCOUNT WHERE NAME = ? AND PASSWORD = ?;"
+        sql = "SELECT ID, NAME, TYPE FROM T_ACCOUNT WHERE NAME = ? AND PASSWORD = ? AND DELETED = 0;"
         # 数据集合
         data = (account, password)
         # 执行数据库操作
@@ -26,7 +26,7 @@ class Auth:
             cls.logon_user = None
             return False
         else:
-            cls.logon_user = result[0][0]
+            cls.logon_user = result[0]
             return True
 
     @classmethod
