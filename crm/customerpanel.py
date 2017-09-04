@@ -10,11 +10,16 @@ class CustomerPanel(wx.Panel):
     """
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-
         self.service = service.CrmService()
-
-        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.grid = None
         self.edit_win = None
+        self.init_layout()
+
+    """
+    展现渲染
+    """
+    def init_layout(self):
+        sizer = wx.BoxSizer(wx.VERTICAL)
         opt_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         create_btn = wx.Button(self, wx.ID_ANY, u"新增")
@@ -45,7 +50,7 @@ class CustomerPanel(wx.Panel):
         val = self.edit_win.ShowModal()
         if val == wx.ID_OK:
             self.edit_win.save()
-            wx.MessageBox(u"保存成功！", "通知")
+            wx.MessageBox(u"保存成功！", "提示", style=wx.ICON_INFORMATION)
         self.edit_win.Destroy()
         self.grid.GetTable().data = self.service.search_customer()
         self.grid.reset()
@@ -56,7 +61,7 @@ class CustomerPanel(wx.Panel):
     def open_modify(self, event):
         rows = self.grid.GetSelectedRows()
         if rows is None or len(rows) == 0:
-            wx.MessageBox(u"请选择要修改的数据！", "警告")
+            wx.MessageBox(u"请选择要修改的数据！", "提示", style=wx.ICON_HAND)
             return False
         selected = rows[0]
         select_data = self.grid.GetTable().data[selected]
@@ -66,7 +71,7 @@ class CustomerPanel(wx.Panel):
         val = self.edit_win.ShowModal()
         if val == wx.ID_OK:
             self.edit_win.update()
-            wx.MessageBox(u"修改成功！", "通知")
+            wx.MessageBox(u"修改成功！", "提示", style=wx.ICON_INFORMATION)
         self.edit_win.Destroy()
         self.grid.GetTable().data = self.service.search_customer()
         self.grid.reset()
@@ -77,11 +82,18 @@ class CustomerPanel(wx.Panel):
     def on_delete(self, event):
         rows = self.grid.GetSelectedRows()
         if rows is None or len(rows) == 0:
-            wx.MessageBox(u"请选择要删除的数据！", "警告")
+            wx.MessageBox(u"请选择要删除的数据！", "提示", style=wx.ICON_HAND)
             return False
 
         selected = rows[0]
         select_data = self.grid.GetTable().data[selected]
+
+        dlg = wx.MessageDialog(self, u"是否确定删除数据？", "警告", style=wx.YES_NO | wx.NO_DEFAULT | wx.ICON_INFORMATION)
+        val = dlg.ShowModal()
+        if val == wx.ID_NO:
+            return False
+        dlg.Destroy()
+
         self.service.delete_customer(select_data[5])
 
         self.grid.GetTable().data = self.service.search_customer()
@@ -131,12 +143,17 @@ class CustomerDataTable(gridlib.GridTableBase):
     def GetColLabelValue(self, col):
         return self.colLabels[col]
 
+    """
+    视图重置
+    """
     def reset_view(self, grid):
         grid.BeginBatch()
 
         for current, new, del_msg, add_msg in [
-            (self._rows, self.GetNumberRows(), gridlib.GRIDTABLE_NOTIFY_ROWS_DELETED, gridlib.GRIDTABLE_NOTIFY_ROWS_APPENDED),
-            (self._cols, self.GetNumberCols(), gridlib.GRIDTABLE_NOTIFY_COLS_DELETED, gridlib.GRIDTABLE_NOTIFY_COLS_APPENDED),
+            (self._rows, self.GetNumberRows(), gridlib.GRIDTABLE_NOTIFY_ROWS_DELETED,
+             gridlib.GRIDTABLE_NOTIFY_ROWS_APPENDED),
+            (self._cols, self.GetNumberCols(), gridlib.GRIDTABLE_NOTIFY_COLS_DELETED,
+             gridlib.GRIDTABLE_NOTIFY_COLS_APPENDED),
         ]:
             if new < current:
                 msg = gridlib.GridTableMessage(self, del_msg, new, current-new)
@@ -177,11 +194,14 @@ class CustomerGrid(gridlib.Grid):
 
         # self.Bind(gridlib.EVT_GRID_LABEL_LEFT_CLICK, self.OnLabelLeftClick)
 
+    """
+    重置网格
+    """
     def reset(self):
         self._table.reset_view(self)
 
-    def OnLabelLeftClick(self, evt):
-        self.selected = evt.GetRow()
+    # def OnLabelLeftClick(self, evt):
+    #     self.selected = evt.GetRow()
 
         # simple cell formatting
 

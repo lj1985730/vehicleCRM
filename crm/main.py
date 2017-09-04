@@ -11,4 +11,3 @@ if __name__ == '__main__':
         window.on_login(window)
 
     app.MainLoop()
-

@@ -27,7 +27,7 @@ class Database(object):
     连接数据库
     '''
     def connect(self):
-        self.conn = sqlite3.connect("..\\data\\vehicleCrm.db")
+        self.conn = sqlite3.connect("data\\vehicleCrm.db")
         return self.conn
 
     '''
@@ -68,7 +68,7 @@ class Database(object):
     '''
     def load_all(self, table_name):
         sql = "SELECT * FROM %s;" % table_name
-        return self.execute_query(sql, null)
+        return self.execute_query(sql, ())
 
     '''
         获取表某条数据
