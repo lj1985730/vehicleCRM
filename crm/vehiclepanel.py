@@ -29,11 +29,11 @@ class VehiclePanel(wx.Panel):
         opt_sizer.Add(label, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
         self.alarm_checker = \
             wx.ComboBox(self, wx.ID_ANY, size=wx.Size(80, -1), choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
-        self.alarm_checker.Append(u"无", 10000)
-        self.alarm_checker.Append(u"1个月", 30)
-        self.alarm_checker.Append(u"2个月", 60)
-        self.alarm_checker.Append(u"3个月", 90)
-        self.alarm_checker.SetValue(u"无")
+        self.alarm_checker.Append(u"全部", 10000)
+        self.alarm_checker.Append(u"30天内", 30)
+        self.alarm_checker.Append(u"60天内", 60)
+        self.alarm_checker.Append(u"90天内", 90)
+        self.alarm_checker.SetValue(u"全部")
         self.Bind(wx.EVT_COMBOBOX, self.on_select_alarm, self.alarm_checker)
         opt_sizer.Add(self.alarm_checker, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 

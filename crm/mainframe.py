@@ -1,5 +1,6 @@
 # coding=utf-8
 import wx
+import datetime
 from crm import loginwin, auth, customerpanel, vehiclepanel
 import wx.lib.agw.flatnotebook as fnb
 
@@ -19,7 +20,9 @@ class MainFrame(wx.Frame):
         self._rmenu = None
 
         self.layout_book()
-        # self.create_right_click_menu()
+
+        self.icon = wx.Icon('data\\icon.ico', wx.BITMAP_TYPE_ICO)
+        self.SetIcon(self.icon)
 
         self.CreateStatusBar()    # 状态栏
         self.Center()
@@ -95,12 +98,17 @@ class MainFrame(wx.Frame):
         val = win.ShowModal()
 
         if val == wx.ID_OK:
-            win.do_login()
+            login_result = win.do_login()
+            if not login_result:
+                wx.MessageBox(u"用户名或密码错误！", u"错误", style=wx.ICON_ERROR)
+                return
 
-            is_registered = auth.Auth.registered()
-            if is_registered is None or len(is_registered) == 0:
-                wx.MessageBox(u"请先激活系统！", u"警告", style=wx.ICON_AUTH_NEEDED)
-                return False
+            limit_date = datetime.datetime.strptime("2017-10-31", "%Y-%m-%d")   # 限制使用后门
+            if datetime.datetime.now() > limit_date:
+                is_registered = auth.Auth.registered()
+                if is_registered is None or len(is_registered) == 0:
+                    wx.MessageBox(u"请先激活系统！", u"警告", style=wx.ICON_AUTH_NEEDED)
+                    return
 
             self.toggle_menu()
 

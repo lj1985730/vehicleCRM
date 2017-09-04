@@ -27,7 +27,7 @@ class Database(object):
     连接数据库
     '''
     def connect(self):
-        self.conn = sqlite3.connect("..\\data\\vehicleCrm.db")
+        self.conn = sqlite3.connect("data\\vehicleCrm.db")
         return self.conn
 
     '''
