@@ -1,6 +1,6 @@
 # coding=utf-8
 import wx
-from crm import loginwin, auth, customerpanel, vehiclepanel, service
+from crm import loginwin, auth, customerpanel, vehiclepanel
 import wx.lib.agw.flatnotebook as fnb
 
 

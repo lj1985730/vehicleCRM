@@ -200,8 +200,8 @@ class CustomerGrid(gridlib.Grid):
     def reset(self):
         self._table.reset_view(self)
 
-    def OnLabelLeftClick(self, evt):
-        self.selected = evt.GetRow()
+    # def OnLabelLeftClick(self, evt):
+    #     self.selected = evt.GetRow()
 
         # simple cell formatting
 

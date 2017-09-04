@@ -1,6 +1,5 @@
 # coding=utf-8
 from crm import sqlite
-import uuid
 
 
 class Auth:
