@@ -20,6 +20,8 @@ class ExcelUtil:
         workbook = xlwt.Workbook()
         sheet = workbook.add_sheet(query[0], cell_overwrite_ok=True)
 
+        sheet.set_col_default_width(0x0016)
+
         sheet.write_merge(0, 0, 0, 19, query[1])
 
         sheet.write(1, 0, u"客户姓名")
@@ -46,10 +48,10 @@ class ExcelUtil:
         sheet.write(1, 18, u"保险到期日期")
         sheet.write(1, 19, u"备注")
 
-        for index in range(len(data)):
+        for index in range(0, len(data)):
             vehicle = data[index]
             for c in range(0, 19):
-                sheet.write(index, c, vehicle[c])
+                sheet.write(index + 2, c, vehicle[c])
 
         export_path = r".\export"
         if not os.path.exists(export_path):
