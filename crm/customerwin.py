@@ -138,11 +138,11 @@ class CustomerWin(wx.Dialog):
     """
     def save(self):
         customer = self.get_form_values(False)
-        service.CrmService.save_customer(customer)
+        return service.save_customer(customer)
 
     """
     更新
     """
     def update(self):
         customer = self.get_form_values(False)
-        service.CrmService.update_customer(self.data[5], customer)
+        return service.update_customer(self.data[5], customer)

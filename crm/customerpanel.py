@@ -10,7 +10,6 @@ class CustomerPanel(wx.Panel):
     """
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-        self.service = service.CrmService()
         self.grid = None
         self.edit_win = None
         self.init_layout()
@@ -49,10 +48,14 @@ class CustomerPanel(wx.Panel):
         self.edit_win.CenterOnScreen()
         val = self.edit_win.ShowModal()
         if val == wx.ID_OK:
-            self.edit_win.save()
-            wx.MessageBox(u"保存成功！", "提示", style=wx.ICON_INFORMATION)
+            try:
+                self.edit_win.save()
+            except ValueError as e:
+                wx.MessageBox(str(e), "提示", style=wx.ICON_HAND)
+            else:
+                wx.MessageBox(u"保存成功！", "提示", style=wx.ICON_INFORMATION)
         self.edit_win.Destroy()
-        self.grid.GetTable().data = self.service.search_customer()
+        self.grid.GetTable().data = service.search_customer()
         self.grid.reset()
 
     """
@@ -62,7 +65,7 @@ class CustomerPanel(wx.Panel):
         rows = self.grid.GetSelectedRows()
         if rows is None or len(rows) == 0:
             wx.MessageBox(u"请选择要修改的数据！", "提示", style=wx.ICON_HAND)
-            return False
+            return
         selected = rows[0]
         select_data = self.grid.GetTable().data[selected]
         self.edit_win = customerwin.CustomerWin(self)
@@ -70,10 +73,14 @@ class CustomerPanel(wx.Panel):
         self.edit_win.CenterOnScreen()
         val = self.edit_win.ShowModal()
         if val == wx.ID_OK:
-            self.edit_win.update()
-            wx.MessageBox(u"修改成功！", "提示", style=wx.ICON_INFORMATION)
+            try:
+                self.edit_win.update()
+            except ValueError as e:
+                wx.MessageBox(str(e), "提示", style=wx.ICON_HAND)
+            else:
+                wx.MessageBox(u"修改成功！", "提示", style=wx.ICON_INFORMATION)
         self.edit_win.Destroy()
-        self.grid.GetTable().data = self.service.search_customer()
+        self.grid.GetTable().data = service.search_customer()
         self.grid.reset()
 
     """
@@ -94,9 +101,9 @@ class CustomerPanel(wx.Panel):
             return False
         dlg.Destroy()
 
-        self.service.delete_customer(select_data[5])
+        service.delete_customer(select_data[5])
 
-        self.grid.GetTable().data = self.service.search_customer()
+        self.grid.GetTable().data = service.search_customer()
         self.grid.reset()
 
 
@@ -114,7 +121,7 @@ class CustomerDataTable(gridlib.GridTableBase):
             gridlib.GRID_VALUE_STRING,
             gridlib.GRID_VALUE_STRING
         ]
-        self.data = service.CrmService.search_customer()
+        self.data = service.search_customer()
         self._rows = self.GetNumberRows()
         self._cols = self.GetNumberCols()
 
