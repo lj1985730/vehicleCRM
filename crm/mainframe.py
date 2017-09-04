@@ -79,6 +79,12 @@ class MainFrame(wx.Frame):
     '''
     def layout_book(self):
         self.book = fnb.FlatNotebook(self, wx.ID_ANY, agwStyle=fnb.FNB_DCLICK_CLOSES_TABS)
+        self.book.Bind(wx.EVT_ERASE_BACKGROUND, self.add_bg_img)
+
+    def add_bg_img(self, event):
+        dc = event.GetDC()
+        bmp = wx.Bitmap("data\\bg.jpg")
+        dc.DrawBitmap(bmp, 0, 0)
 
     '''
     注销

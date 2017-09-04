@@ -36,9 +36,16 @@ class CrmService:
         db = sqlite.Database()
         # # 操作语句
         sql = "SELECT NAME, CASE WHEN GENDER = 1 THEN '男' ELSE '女' END AS GENDER,"\
-            " PHONE, ADDRESS, REMARK, ID FROM T_CUSTOMER WHERE DELETED = 0;"
-        # # 执行数据库操作
-        return db.execute_query(sql, None)
+            " PHONE, ADDRESS, REMARK, ID FROM T_CUSTOMER WHERE DELETED = 0"
+
+        query = None
+
+        if auth.Auth.logon_user[2] == 2:
+            sql = sql + " AND MODIFIER = ?"
+            query = (auth.Auth.logon_user[0],)
+
+        # 执行数据库操作
+        return db.execute_query(sql, query)
 
     '''
     新增客户
@@ -110,16 +117,24 @@ class CrmService:
               "D.VALUE, A.INSURANCE_TYPE, A.INSURANCE_START_DATE, A.INSURANCE_END_DATE, " \
               "A.REMARK, C.NAME, A.MODIFY_TIME, A.ID, B.ID, C.ID, D.ID " \
               "FROM T_VEHICLE A " \
-              "LEFT JOIN T_CUSTOMER B ON A.CUSTOMER_ID = B.ID AND B.DELETED = 0 " \
-              "LEFT JOIN T_ACCOUNT C ON A.MODIFIER = C.ID " \
               "LEFT JOIN T_DICT D ON A.INSURANCE_COMPANY = D.ID AND D.TYPE = 1 " \
-              " WHERE A.INSURANCE_END_DATE <= ? ORDER BY A.INSURANCE_END_DATE ASC;"
+              "INNER JOIN T_CUSTOMER B ON A.CUSTOMER_ID = B.ID AND B.DELETED = 0 " \
+              "INNER JOIN T_ACCOUNT C ON A.MODIFIER = C.ID "
+
+        if auth.Auth.logon_user[2] == 2:
+            sql = sql + "AND C.ID = ? "
+
+        sql = sql + "WHERE A.DELETED = 0 AND A.INSURANCE_END_DATE <= ? ORDER BY A.INSURANCE_END_DATE ASC;"
 
         today = datetime.date.today()
         threshold_day = today + datetime.timedelta(days=alarm_day_count)
 
         # 数据集合
-        data = (threshold_day.strftime('%Y-%m-%d'),)
+        if auth.Auth.logon_user[2] == 2:
+            data = (auth.Auth.logon_user[0], threshold_day.strftime('%Y-%m-%d'),)
+        else:
+            data = (auth.Auth.logon_user[0],)
+
         # 执行数据库操作
         return db.execute_query(sql, data)
 
