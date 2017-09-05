@@ -80,7 +80,7 @@ def update_customer(customer_id, customer):
     sql = "UPDATE T_CUSTOMER SET NAME = ?, GENDER = ?, PHONE = ?, ADDRESS = ?, REMARK = ?," \
           "MODIFY_TIME = ?, DELETED = 0, MODIFIER = ? WHERE ID = ?;"
     # 数据集合
-    data = customer + (get_now(), auth.Auth.logon_user[0], data_id)
+    data = customer + (get_now(), auth.Auth.logon_user[0], customer_id)
     # 执行数据库操作
     db.execute_update(sql, data)
     return True

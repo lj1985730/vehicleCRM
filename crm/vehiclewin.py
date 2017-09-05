@@ -5,7 +5,7 @@ import wx.adv
 import wx.xrc
 from wx.lib import intctrl
 
-from crm import service, textvalidator, auth
+from crm import service, textvalidator, platenumvalidator, auth
 
 
 # Class VehicleWin
@@ -79,7 +79,7 @@ class VehicleWin(wx.Dialog):
         label.SetForegroundColour(wx.RED)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.vehiclePlateNumInput =\
-            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1), validator=textvalidator.TextValidator(u"车牌号"))
+            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1), validator=platenumvalidator.PlateNumValidator(None))
         sizer.Add(self.vehiclePlateNumInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         # 车辆型号
@@ -322,6 +322,7 @@ class VehicleWin(wx.Dialog):
             self.customerPhonePanel.SetLabelText(self.data[2])
 
         self.vehiclePlateNumInput.SetValue(self.data[3])
+        self.vehiclePlateNumInput.SetValidator(platenumvalidator.PlateNumValidator(self.data[22]))
 
         self.vehicleModelInput.SetValue(self.data[4])
         if self.data[5] is not None and self.data[5] != "":
