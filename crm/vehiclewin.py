@@ -5,7 +5,7 @@ import wx.adv
 import wx.xrc
 from wx.lib import intctrl
 
-from crm import service, textvalidator, auth
+from crm import service, textvalidator, platenumvalidator, auth
 
 
 # Class VehicleWin
@@ -19,10 +19,10 @@ class VehicleWin(wx.Dialog):
         border = wx.BoxSizer(wx.VERTICAL)
 
         # load customer combo data
-        self.customer_data = service.CrmService.search_customer()
+        self.customer_data = service.search_customer()
 
         # load insurance company combo data
-        self.company_data = service.CrmService.search_dict(1)
+        self.company_data = service.search_dict(1)
 
         # load authorization
         self.current_user = auth.Auth.logon_user
@@ -74,6 +74,14 @@ class VehicleWin(wx.Dialog):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         box_sizer.Add(sizer)
 
+        # 车牌号
+        label = wx.StaticText(self, wx.ID_ANY, u"* 车牌号：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label.SetForegroundColour(wx.RED)
+        sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+        self.vehiclePlateNumInput =\
+            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1), validator=platenumvalidator.PlateNumValidator(None))
+        sizer.Add(self.vehiclePlateNumInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+
         # 车辆型号
         label = wx.StaticText(self, wx.ID_ANY, u"* 车辆型号：", size=(95, -1), style=wx.ALIGN_RIGHT)
         label.SetForegroundColour(wx.RED)
@@ -81,6 +89,10 @@ class VehicleWin(wx.Dialog):
         self.vehicleModelInput =\
             wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1), validator=textvalidator.TextValidator(u"车辆型号"))
         sizer.Add(self.vehicleModelInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+
+        # new line ########################################################################
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        box_sizer.Add(sizer)
 
         # 车辆登记日期
         label = wx.StaticText(self, wx.ID_ANY, u"* 车辆登记日期：", size=(95, -1), style=wx.ALIGN_RIGHT)
@@ -91,16 +103,16 @@ class VehicleWin(wx.Dialog):
                                   style=wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY)
         sizer.Add(self.vehicleRegDate, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
-        # new line ########################################################################
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        box_sizer.Add(sizer)
-
         # 公里数
         label = wx.StaticText(self, wx.ID_ANY, u"公里数：", size=(95, -1), style=wx.ALIGN_RIGHT)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.mileageInput =\
             intctrl.IntCtrl(self, wx.ID_ANY, size=wx.Size(200, -1))
         sizer.Add(self.mileageInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+
+        # new line ########################################################################
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        box_sizer.Add(sizer)
 
         # 过户次数
         label = wx.StaticText(self, wx.ID_ANY, u"* 过户次数：", size=(95, -1), style=wx.ALIGN_RIGHT)
@@ -276,6 +288,7 @@ class VehicleWin(wx.Dialog):
     def auth_control(self):
         if self.current_user[2] == 2:
             self.customerCombobox.Disable()
+            self.vehiclePlateNumInput.Disable()
             self.vehicleModelInput.Disable()
             self.vehicleRegDate.Disable()
             self.transCountInput.Disable()
@@ -308,32 +321,35 @@ class VehicleWin(wx.Dialog):
             self.customerGenderPanel.SetLabelText(self.data[1])
             self.customerPhonePanel.SetLabelText(self.data[2])
 
-        self.vehicleModelInput.SetValue(self.data[3])
-        if self.data[4] is not None and self.data[4] != "":
-            self.vehicleRegDate.SetValue(self.parse_date(self.data[4]))
-        self.mileageInput.SetValue(self.data[5])
-        self.transCountInput.SetValue(self.data[6])
+        self.vehiclePlateNumInput.SetValue(self.data[3])
+        self.vehiclePlateNumInput.SetValidator(platenumvalidator.PlateNumValidator(self.data[22]))
 
-        self.loanProductInput.SetValue(self.data[7])
-        self.loanPeriodInput.SetValue(self.data[8])
-        self.loanTermInput.SetValue(self.data[9])
-        self.loanValueInput.SetValue(self.data[10])
-        if self.data[11] is not None and self.data[11] != "":
-            self.loanReportDate.SetValue(self.parse_date(self.data[11]))
+        self.vehicleModelInput.SetValue(self.data[4])
+        if self.data[5] is not None and self.data[5] != "":
+            self.vehicleRegDate.SetValue(self.parse_date(self.data[5]))
+        self.mileageInput.SetValue(self.data[6])
+        self.transCountInput.SetValue(self.data[7])
+
+        self.loanProductInput.SetValue(self.data[8])
+        self.loanPeriodInput.SetValue(self.data[9])
+        self.loanTermInput.SetValue(self.data[10])
+        self.loanValueInput.SetValue(self.data[11])
         if self.data[12] is not None and self.data[12] != "":
-            self.loanPassedDate.SetValue(self.parse_date(self.data[12]))
+            self.loanReportDate.SetValue(self.parse_date(self.data[12]))
         if self.data[13] is not None and self.data[13] != "":
-            self.loanDate.SetValue(self.parse_date(self.data[13]))
+            self.loanPassedDate.SetValue(self.parse_date(self.data[13]))
+        if self.data[14] is not None and self.data[14] != "":
+            self.loanDate.SetValue(self.parse_date(self.data[14]))
 
-        if self.data[14] is not None:
-            self.insuranceCompanyCombobox.SetValue(self.data[14])
-        self.insuranceTypeInput.SetValue(self.data[15])
-        if self.data[16] is not None and self.data[16] != "":
-            self.insuranceStartDate.SetValue(self.parse_date(self.data[16]))
-        if self.data[17] is not None and self.data[17] != "":
-            self.insuranceEndDate.SetValue(self.parse_date(self.data[17]))
+        if self.data[15] is not None:
+            self.insuranceCompanyCombobox.SetValue(self.data[15])
+        self.insuranceTypeInput.SetValue(self.data[16])
+        if self.data[16] is not None and self.data[17] != "":
+            self.insuranceStartDate.SetValue(self.parse_date(self.data[17]))
+        if self.data[17] is not None and self.data[18] != "":
+            self.insuranceEndDate.SetValue(self.parse_date(self.data[18]))
 
-        self.remarkInput.SetValue(self.data[18])
+        self.remarkInput.SetValue(self.data[19])
 
     """
     表单取值
@@ -344,6 +360,11 @@ class VehicleWin(wx.Dialog):
             wx.MessageBox("请选择客户！", "提示", style=wx.ICON_HAND)
             return False
         form_values = form_values + (self.customerCombobox.GetClientData(self.customerCombobox.GetSelection()),)
+
+        if self.vehiclePlateNumInput.GetValue().strip() == "":
+            wx.MessageBox("请输入车牌号！", "提示", style=wx.ICON_HAND)
+            return False
+        form_values = form_values + (self.vehiclePlateNumInput.GetValue().strip(),)
 
         if self.vehicleModelInput.GetValue().strip() == "":
             wx.MessageBox("请输入车辆型号！", "提示", style=wx.ICON_HAND)
@@ -411,21 +432,21 @@ class VehicleWin(wx.Dialog):
     """
     def get_data(self):
         vehicle = self.get_form_values()
-        return vehicle + (self.data[21],)
+        return vehicle + (self.data[22],)
 
     """
     保存
     """
     def save(self):
         customer = self.get_form_values()
-        service.CrmService.save_vehicle(customer)
+        service.save_vehicle(customer)
 
     """
     更新
     """
     def update(self):
         customer = self.get_form_values()
-        service.CrmService.update_vehicle(self.data[21], customer)
+        service.update_vehicle(self.data[22], customer)
 
     '''
     时间字符串转wx.dateTime

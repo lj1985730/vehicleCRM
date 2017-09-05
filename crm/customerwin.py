@@ -1,7 +1,7 @@
 # coding=utf-8
 import wx
 import wx.xrc
-from crm import service, textvalidator
+from crm import service, textvalidator, namevalidator
 
 
 # Class CustomerWin
@@ -22,7 +22,7 @@ class CustomerWin(wx.Dialog):
         box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         self.customerNameInput = wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1),
-                                             validator=textvalidator.TextValidator(u"姓名"))
+                                             validator=namevalidator.NameValidator(None))
         box.Add(self.customerNameInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
@@ -98,6 +98,7 @@ class CustomerWin(wx.Dialog):
     def set_data(self, data):
         self.data = data
         self.customerNameInput.SetValue(self.data[0])
+        self.customerNameInput.SetValidator(namevalidator.NameValidator(data[5]))
         if self.data[1] == '男':
             self.customerGender1.SetValue(True)
         else:
@@ -138,11 +139,11 @@ class CustomerWin(wx.Dialog):
     """
     def save(self):
         customer = self.get_form_values(False)
-        service.CrmService.save_customer(customer)
+        return service.save_customer(customer)
 
     """
     更新
     """
     def update(self):
         customer = self.get_form_values(False)
-        service.CrmService.update_customer(self.data[5], customer)
+        return service.update_customer(self.data[5], customer)
