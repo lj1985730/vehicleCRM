@@ -23,7 +23,7 @@ def get_uuid():
     return str(uuid.uuid1()).upper()
 
 
-def search_customer():
+def search_customer(name):
     """
     :return: 客户信息元组(名称，性别，地址，电话, 备注)
     """
@@ -35,9 +35,14 @@ def search_customer():
 
     query = None
 
-    if auth.Auth.logon_user[2] == 2:
-        sql = sql + " AND MODIFIER = ?"
-        query = (auth.Auth.logon_user[0],)
+    # if auth.Auth.logon_user[2] == 2:
+    #     sql = sql + " AND MODIFIER = ?"
+    #     query = (auth.Auth.logon_user[0],)
+
+    if name is not None and name != '':
+        sql = sql + " AND NAME LIKE '%" + name + "%'"
+
+    sql = sql + " ORDER BY NAME ASC"
 
     # 执行数据库操作
     return db.execute_query(sql, query)
@@ -145,8 +150,8 @@ def search_vehicle(alarm_day_count):
           "INNER JOIN T_CUSTOMER B ON A.CUSTOMER_ID = B.ID AND B.DELETED = 0 " \
           "INNER JOIN T_ACCOUNT C ON A.MODIFIER = C.ID "
 
-    if auth.Auth.logon_user[2] == 2:
-        sql = sql + "AND C.ID = ? "
+    # if auth.Auth.logon_user[2] == 2:
+    #     sql = sql + "AND C.ID = ? "
 
     sql = sql + "WHERE A.DELETED = 0 AND A.INSURANCE_END_DATE <= ? ORDER BY A.INSURANCE_END_DATE ASC;"
 
@@ -154,10 +159,10 @@ def search_vehicle(alarm_day_count):
     threshold_day = today + datetime.timedelta(days=alarm_day_count)
 
     # 数据集合
-    if auth.Auth.logon_user[2] == 2:
-        data = (auth.Auth.logon_user[0], threshold_day.strftime('%Y-%m-%d'),)
-    else:
-        data = (auth.Auth.logon_user[0],)
+    # if auth.Auth.logon_user[2] == 2:
+    #     data = (auth.Auth.logon_user[0], threshold_day.strftime('%Y-%m-%d'),)
+    # else:
+    data = (threshold_day.strftime('%Y-%m-%d'),)
 
     # 执行数据库操作
     return db.execute_query(sql, data)

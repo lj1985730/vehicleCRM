@@ -107,6 +107,8 @@ class MainFrame(wx.Frame):
             login_result = win.do_login()
             if not login_result:
                 wx.MessageBox(u"用户名或密码错误！", u"错误", style=wx.ICON_ERROR)
+                win.Destroy()
+                self.on_login(None)
                 return
 
             limit_date = datetime.datetime.strptime("2017-10-31", "%Y-%m-%d")   # 限制使用后门
@@ -117,6 +119,7 @@ class MainFrame(wx.Frame):
                     return
 
             self.toggle_menu()
+            wx.MessageBox(u"登陆成功！", u"提示", style=wx.ICON_INFORMATION)
 
         win.Destroy()
 

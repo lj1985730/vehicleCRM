@@ -55,7 +55,7 @@ class CustomerPanel(wx.Panel):
             else:
                 wx.MessageBox(u"保存成功！", "提示", style=wx.ICON_INFORMATION)
         self.edit_win.Destroy()
-        self.grid.GetTable().data = service.search_customer()
+        self.grid.GetTable().data = service.search_customer(None)
         self.grid.reset()
 
     """
@@ -80,7 +80,7 @@ class CustomerPanel(wx.Panel):
             else:
                 wx.MessageBox(u"修改成功！", "提示", style=wx.ICON_INFORMATION)
         self.edit_win.Destroy()
-        self.grid.GetTable().data = service.search_customer()
+        self.grid.GetTable().data = service.search_customer(None)
         self.grid.reset()
 
     """
@@ -103,7 +103,7 @@ class CustomerPanel(wx.Panel):
 
         service.delete_customer(select_data[5])
 
-        self.grid.GetTable().data = service.search_customer()
+        self.grid.GetTable().data = service.search_customer(None)
         self.grid.reset()
 
 
@@ -121,7 +121,7 @@ class CustomerDataTable(gridlib.GridTableBase):
             gridlib.GRID_VALUE_STRING,
             gridlib.GRID_VALUE_STRING
         ]
-        self.data = service.search_customer()
+        self.data = service.search_customer(None)
         self._rows = self.GetNumberRows()
         self._cols = self.GetNumberCols()
 

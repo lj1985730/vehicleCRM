@@ -19,7 +19,7 @@ class VehicleWin(wx.Dialog):
         border = wx.BoxSizer(wx.VERTICAL)
 
         # load customer combo data
-        self.customer_data = service.search_customer()
+        self.customer_data = service.search_customer(None)
 
         # load insurance company combo data
         self.company_data = service.search_dict(1)
@@ -42,13 +42,16 @@ class VehicleWin(wx.Dialog):
         label.SetForegroundColour(wx.RED)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.customerCombobox =\
-            wx.ComboBox(self, wx.ID_ANY, size=wx.Size(140, -1), choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
+            wx.ComboBox(self, wx.ID_ANY, size=wx.Size(140, -1), choices=[], style=wx.CB_DROPDOWN)
 
         for customer in self.customer_data:
             self.customerCombobox.Append(customer[0], customer[5])
 
         sizer.Add(self.customerCombobox, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.Bind(wx.EVT_COMBOBOX, self.select_customer, self.customerCombobox)
+        self.Bind(wx.EVT_TEXT, self.filter_customer, self.customerCombobox)
+        self.Bind(wx.EVT_CHAR, self.enable_filter, self.customerCombobox)
+        self.ignoreEvtText = False
 
         # 客户性别
         label = wx.StaticText(self, wx.ID_ANY, u"性别：", size=(60, -1), style=wx.ALIGN_RIGHT)
@@ -299,6 +302,31 @@ class VehicleWin(wx.Dialog):
             self.insuranceStartDate.Disable()
             self.insuranceEndDate.Disable()
 
+    def enable_filter(self, event):
+        self.ignoreEvtText = False
+        event.Skip()
+
+    '''
+    过滤客户触发
+    '''
+    def filter_customer(self, event):
+
+        if self.ignoreEvtText:
+            self.ignoreEvtText = False
+            return
+
+        text = event.GetString().strip()
+        self.customer_data = service.search_customer(text)
+        data_count = len(self.customer_data)
+
+        for index in range(0, data_count):
+            self.customerCombobox.Insert(self.customer_data[index][0], index, self.customer_data[index][5])
+
+        for i in range(data_count, len(self.customerCombobox.GetItems())):
+            self.customerCombobox.Delete(data_count)
+
+        self.ignoreEvtText = False
+
     '''
     选择客户触发
     '''
@@ -308,6 +336,8 @@ class VehicleWin(wx.Dialog):
         customer = self.customer_data[event.GetSelection()]
         self.customerGenderPanel.SetLabelText(customer[1])
         self.customerPhonePanel.SetLabelText(customer[2])
+        self.ignoreEvtText = True
+        event.Skip()
 
     """
     表单赋值
