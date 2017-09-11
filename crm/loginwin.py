@@ -2,7 +2,7 @@
 import wx
 import wx.xrc
 
-from crm import auth, textvalidator
+from crm import auth, textvalidator, service
 
 
 class LoginWin(wx.Dialog):
@@ -12,16 +12,22 @@ class LoginWin(wx.Dialog):
 
         sizer = wx.BoxSizer(wx.VERTICAL)
 
-        title = wx.StaticText(self, -1, u"请输入账户密码")
+        title = wx.StaticText(self, -1, u"请选择账户输入密码")
         sizer.Add(title, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         login_name_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.loginNameLabel = wx.StaticText(self, wx.ID_ANY, u"账户：")
         login_name_sizer.Add(self.loginNameLabel, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
-        self.loginNameInput = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, size=(80, -1),
-                                          validator=textvalidator.TextValidator(u"账户"))
-        self.loginNameInput.SetMaxLength(20)
-        login_name_sizer.Add(self.loginNameInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+        self.loginNameCombobox = \
+            wx.ComboBox(self, wx.ID_ANY, size=wx.Size(80, -1), choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY,
+                        validator=textvalidator.TextValidator(u"账户"))
+
+        accounts = service.search_account(None)
+
+        for account in accounts:
+            self.loginNameCombobox.Append(account[1], account[0])
+
+        login_name_sizer.Add(self.loginNameCombobox, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
         sizer.Add(login_name_sizer, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
         login_pass_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -53,4 +59,4 @@ class LoginWin(wx.Dialog):
         sizer.Fit(self)
 
     def do_login(self):
-        return auth.Auth.login(self.loginNameInput.GetValue(), self.loginPassInput.GetValue())
+        return auth.Auth.login(self.loginNameCombobox.GetValue(), self.loginPassInput.GetValue())

@@ -194,7 +194,7 @@ class VehicleDataTable(gridlib.GridTableBase):
             gridlib.GRID_VALUE_STRING,
             gridlib.GRID_VALUE_STRING
         ]
-        self.data = service.search_vehicle(10000)
+        self.data = service.search_vehicle(10000, None)
 
         self._rows = self.GetNumberRows()
         self._cols = self.GetNumberCols()

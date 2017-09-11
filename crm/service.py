@@ -23,45 +23,44 @@ def get_uuid():
     return str(uuid.uuid1()).upper()
 
 
-def search_customer(name):
+def search_customer(name, id_number):
     """
-    :return: 客户信息元组(名称，性别，地址，电话, 备注)
+    :parameter: name 姓名
+    :parameter: id_number 身份证号
+    :return: 客户信息元组(名称，性别，身份证号，地址，电话, 备注)
     """
     # 数据库对象
     db = sqlite.Database()
     # # 操作语句
     sql = "SELECT NAME, CASE WHEN GENDER = 1 THEN '男' ELSE '女' END AS GENDER," \
-          " PHONE, ADDRESS, REMARK, ID FROM T_CUSTOMER WHERE DELETED = 0"
-
-    query = None
-
-    # if auth.Auth.logon_user[2] == 2:
-    #     sql = sql + " AND MODIFIER = ?"
-    #     query = (auth.Auth.logon_user[0],)
+          " ID_NUMBER, PHONE, ADDRESS, REMARK, ID FROM T_CUSTOMER WHERE DELETED = 0"
 
     if name is not None and name != '':
         sql = sql + " AND NAME LIKE '%" + name + "%'"
 
+    if id_number is not None and id_number != '':
+        sql = sql + " AND ID_NUMBER LIKE '%" + id_number + "%'"
+
     sql = sql + " ORDER BY NAME ASC"
 
     # 执行数据库操作
-    return db.execute_query(sql, query)
+    return db.execute_query(sql, None)
 
 
 def save_customer(customer):
     """
-    新增客户
-    @customer 客户
-    """
+    保存客户
 
-    if check_customer_name_exist(customer[0], None):
-        raise ValueError("此姓名已被使用！")
+    :parameter: customer 客户
+    """
+    # if check_customer_name_exist(customer[0], None):
+    #     raise ValueError("此姓名已被使用！")
 
     # 数据库对象
     db = sqlite.Database()
     # 操作语句
-    sql = "INSERT INTO T_CUSTOMER(ID, NAME, GENDER, PHONE, ADDRESS, REMARK, DELETED, MODIFY_TIME, MODIFIER) " \
-          "VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?);"
+    sql = "INSERT INTO T_CUSTOMER(ID,NAME,GENDER,ID_NUMBER,PHONE,ADDRESS,REMARK,DELETED,MODIFY_TIME,MODIFIER) " \
+          "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?);"
     # 数据集合
     data = (get_uuid(),) + customer + (get_now(), auth.Auth.logon_user[0])
     # 执行数据库操作
@@ -72,17 +71,18 @@ def save_customer(customer):
 def update_customer(customer_id, customer):
     """
     更新客户
-    @customer_id 客户ID
-    @customer 客户信息元组(名称，性别，地址，电话，备注)
+
+    :parameter: customer_id 客户ID
+    :parameter: customer 客户信息元组(名称，性别，身份证号，地址，电话，备注)
     """
 
-    if check_customer_name_exist(customer[0], customer_id):
-        raise ValueError("此姓名已被使用！")
+    # if check_customer_name_exist(customer[0], customer_id):
+    #     raise ValueError("此姓名已被使用！")
 
     # 数据库对象
     db = sqlite.Database()
     # 操作语句
-    sql = "UPDATE T_CUSTOMER SET NAME = ?, GENDER = ?, PHONE = ?, ADDRESS = ?, REMARK = ?," \
+    sql = "UPDATE T_CUSTOMER SET NAME = ?, GENDER = ?, ID_NUMBER = ?, PHONE = ?, ADDRESS = ?, REMARK = ?," \
           "MODIFY_TIME = ?, DELETED = 0, MODIFIER = ? WHERE ID = ?;"
     # 数据集合
     data = customer + (get_now(), auth.Auth.logon_user[0], customer_id)
@@ -94,8 +94,9 @@ def update_customer(customer_id, customer):
 def check_customer_name_exist(customer_name, customer_id):
     """
     客户名称校验
-    @customer_name 客户名称
-    @customer_id   客户ID
+
+    :parameter: customer_name 客户名称
+    :parameter: customer_id   客户ID
     """
     # 数据库对象
     db = sqlite.Database()
@@ -110,10 +111,31 @@ def check_customer_name_exist(customer_name, customer_id):
     return len(db.execute_query(sql, query)) > 0
 
 
+def check_id_number_exist(id_number, customer_id):
+    """
+    身份证号校验
+
+    :parameter: id_number 身份证号
+    :parameter: customer_id   客户ID
+    """
+    # 数据库对象
+    db = sqlite.Database()
+    # 操作语句
+    sql = "SELECT 1 FROM T_CUSTOMER WHERE ID_NUMBER = ? AND DELETED = 0"
+    query = (id_number,)
+
+    if customer_id is not None:
+        sql += " AND ID <> ?"
+        query = query + (customer_id,)
+    # 执行数据库操作
+    return len(db.execute_query(sql, query)) > 0
+
+
 def delete_customer(data_id):
     """
     删除客户
-    @data_id 客户ID
+
+    :parameter: 客户ID
     """
     # 数据库对象
     db = sqlite.Database()
@@ -125,16 +147,18 @@ def delete_customer(data_id):
     db.execute_update(sql, data)
 
 
-def search_vehicle(alarm_day_count):
+def search_vehicle(alarm_day_count, plate_num):
     """
     获取需要报警的车辆信息
-    @alarm_day_count 提前报警天数
-    @:return List[
-        客户名称，客户性别，电话，
+
+    :parameter: alarm_day_count 提前报警天数
+    :parameter: plate_num 车牌号
+    :return: List[
+        (客户名称，客户性别，电话，
         车牌号，车辆型号，车辆登记日期，公里数，过户次数
         贷款产品，贷款期次，贷款年限，贷款金额，贷款提报日期，贷款通过日期，放款日期，
         承保公司，险种，保险生效日期，保险到期日期，
-        备注，修改人，修改时间，车辆信息ID，客户ID，账户ID，承保公司ID]
+        备注，修改人，修改时间，车辆信息ID，客户ID，账户ID，承保公司ID)]
     """
     # 数据库对象
     db = sqlite.Database()
@@ -150,18 +174,17 @@ def search_vehicle(alarm_day_count):
           "INNER JOIN T_CUSTOMER B ON A.CUSTOMER_ID = B.ID AND B.DELETED = 0 " \
           "INNER JOIN T_ACCOUNT C ON A.MODIFIER = C.ID "
 
-    # if auth.Auth.logon_user[2] == 2:
-    #     sql = sql + "AND C.ID = ? "
+    sql = sql + "WHERE A.DELETED = 0 AND A.INSURANCE_END_DATE <= ?"
 
-    sql = sql + "WHERE A.DELETED = 0 AND A.INSURANCE_END_DATE <= ? ORDER BY A.INSURANCE_END_DATE ASC;"
+    if plate_num is not None and plate_num != '':
+        sql = sql + " AND A.PLATE_NUM LIKE '%" + plate_num + "%'"
+
+    sql = sql + " ORDER BY A.INSURANCE_END_DATE ASC;"
 
     today = datetime.date.today()
     threshold_day = today + datetime.timedelta(days=alarm_day_count)
 
     # 数据集合
-    # if auth.Auth.logon_user[2] == 2:
-    #     data = (auth.Auth.logon_user[0], threshold_day.strftime('%Y-%m-%d'),)
-    # else:
     data = (threshold_day.strftime('%Y-%m-%d'),)
 
     # 执行数据库操作
@@ -171,7 +194,8 @@ def search_vehicle(alarm_day_count):
 def save_vehicle(vehicle):
     """
     新增车辆
-    @vehicle 车辆信息元组(
+
+    :parameter: vehicle 车辆信息元组(
         客户ID，车牌号，型号，车辆登记日期，公里数，过户次数，
         贷款产品，贷款期次，贷款年限，贷款金额，贷款提报日期，贷款通过日期，放款日期，
         承保公司ID，险种，保险生效日期，保险到期日期，
@@ -194,8 +218,8 @@ def save_vehicle(vehicle):
 def update_vehicle(data_id, vehicle):
     """
     更新车辆
-    @data_id 车辆ID
-    @vehicle 车辆信息元组(
+        :parameter: data_id 车辆ID
+        :parameter: vehicle 车辆信息元组(
         客户ID，车牌号，型号，车辆登记日期，公里数，过户次数，
         贷款产品，贷款期次，贷款年限，贷款金额，贷款提报日期，贷款通过日期，放款日期，
         承保公司ID，险种，保险生效日期，保险到期日期，
@@ -281,8 +305,9 @@ def update_vehicle(data_id, vehicle):
 def check_plate_num_exist(plate_num, vehicle_id):
     """
     车牌照校验
-    @plate_num     车牌照
-    @vehicle_id     车辆ID
+
+    :parameter: plate_num 车牌照
+    :parameter: vehicle_id 车辆ID
     """
     # 数据库对象
     db = sqlite.Database()
@@ -300,7 +325,8 @@ def check_plate_num_exist(plate_num, vehicle_id):
 def delete_vehicle(data_id):
     """
     删除车辆
-    @data_id 车辆ID
+
+    :parameter: data_id 车辆ID
     """
     # 数据库对象
     db = sqlite.Database()
@@ -315,15 +341,36 @@ def delete_vehicle(data_id):
 def search_dict(dic_type):
     """
     获取字典列表
-    @dic_type 字典类型
+
+    :parameter: dic_type 字典类型
     """
     # 数据库对象
     db = sqlite.Database()
     # 操作语句
-    sql = "SELECT ID, VALUE" \
-          " FROM T_DICT" \
-          " WHERE DELETED = 0 AND TYPE = ?" \
-          " ORDER BY SORT ASC;"
+    sql = "SELECT ID, VALUE FROM T_DICT WHERE DELETED = 0 AND TYPE = ? ORDER BY SORT ASC;"
 
     # 执行数据库操作
     return db.execute_query(sql, (dic_type,))
+
+
+def search_account(account_type):
+    """
+    获取账户
+
+    :parameter: account_type 账户类型
+    """
+    # 数据库对象
+    db = sqlite.Database()
+    # 操作语句
+    sql = "SELECT ID, NAME FROM T_ACCOUNT WHERE DELETED = 0 AND TYPE <> 0"
+
+    query = None
+
+    if account_type is not None and account_type != '':
+        sql = sql + " AND TYPE = ?"
+        query = (account_type,)
+
+    sql = sql + " ORDER BY TYPE, NAME ASC;"
+
+    # 执行数据库操作
+    return db.execute_query(sql, query)

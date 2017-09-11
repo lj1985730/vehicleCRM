@@ -1,7 +1,7 @@
 # coding=utf-8
 import wx
 import wx.xrc
-from crm import service, textvalidator, namevalidator
+from crm import service, textvalidator, idnumbervalidator
 
 
 # Class CustomerWin
@@ -17,12 +17,12 @@ class CustomerWin(wx.Dialog):
         # 姓名
         box = wx.BoxSizer(wx.HORIZONTAL)
 
-        label = wx.StaticText(self, wx.ID_ANY, u"* 姓名：")
+        label = wx.StaticText(self, wx.ID_ANY, u"* 姓名：", size=(80, -1), style=wx.ALIGN_RIGHT)
         label.SetForegroundColour(wx.RED)
         box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         self.customerNameInput = wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1),
-                                             validator=namevalidator.NameValidator(None))
+                                             validator=textvalidator.TextValidator(u"姓名"))
         box.Add(self.customerNameInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
@@ -30,7 +30,7 @@ class CustomerWin(wx.Dialog):
         # 性别
         box = wx.BoxSizer(wx.HORIZONTAL)
 
-        label = wx.StaticText(self, wx.ID_ANY, u"  性别：")
+        label = wx.StaticText(self, wx.ID_ANY, u"  性别：", size=(80, -1), style=wx.ALIGN_RIGHT)
         box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         self.customerGender1 = wx.RadioButton(self, wx.ID_ANY, u"男", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
@@ -41,10 +41,23 @@ class CustomerWin(wx.Dialog):
 
         border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
+        # 身份证
+        box = wx.BoxSizer(wx.HORIZONTAL)
+
+        label = wx.StaticText(self, wx.ID_ANY, u"* 身份证：", size=(80, -1), style=wx.ALIGN_RIGHT)
+        label.SetForegroundColour(wx.RED)
+        box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+
+        self.customerIdNumberInput = wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1),
+                                                 validator=idnumbervalidator.IdNumberValidator(None))
+        box.Add(self.customerIdNumberInput, 1, wx.ALIGN_CENTER | wx.ALL | wx.EXPAND, 5)
+
+        border.Add(box, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
         # 电话
         box = wx.BoxSizer(wx.HORIZONTAL)
 
-        label = wx.StaticText(self, wx.ID_ANY, u"* 电话：")
+        label = wx.StaticText(self, wx.ID_ANY, u"* 电话：", size=(80, -1), style=wx.ALIGN_RIGHT)
         label.SetForegroundColour(wx.Colour(255, 0, 0))
         box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
 
@@ -57,7 +70,7 @@ class CustomerWin(wx.Dialog):
         # 地址
         box = wx.BoxSizer(wx.HORIZONTAL)
 
-        label = wx.StaticText(self, wx.ID_ANY, u"  地址：")
+        label = wx.StaticText(self, wx.ID_ANY, u"  地址：", size=(80, -1), style=wx.ALIGN_RIGHT)
         box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         self.customerAddressInput = wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1))
@@ -68,7 +81,7 @@ class CustomerWin(wx.Dialog):
         # 备注
         box = wx.BoxSizer(wx.HORIZONTAL)
 
-        label = wx.StaticText(self, wx.ID_ANY, u"  备注：")
+        label = wx.StaticText(self, wx.ID_ANY, u"  备注：", size=(80, -1), style=wx.ALIGN_RIGHT)
         box.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         self.customerRemarkInput = wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1), style=wx.TE_MULTILINE)
@@ -98,14 +111,15 @@ class CustomerWin(wx.Dialog):
     def set_data(self, data):
         self.data = data
         self.customerNameInput.SetValue(self.data[0])
-        self.customerNameInput.SetValidator(namevalidator.NameValidator(data[5]))
         if self.data[1] == '男':
             self.customerGender1.SetValue(True)
         else:
             self.customerGender2.SetValue(True)
-        self.customerPhoneInput.SetValue(self.data[2])
-        self.customerAddressInput.SetValue(self.data[3])
-        self.customerRemarkInput.SetValue(self.data[4])
+        self.customerIdNumberInput.SetValue(self.data[2])
+        self.customerIdNumberInput.SetValidator(idnumbervalidator.IdNumberValidator(self.data[6]))
+        self.customerPhoneInput.SetValue(self.data[3])
+        self.customerAddressInput.SetValue(self.data[4])
+        self.customerRemarkInput.SetValue(self.data[5])
 
     """
     表单取值
@@ -122,6 +136,7 @@ class CustomerWin(wx.Dialog):
         return (
             self.customerNameInput.GetValue().strip(),
             gender,
+            self.customerIdNumberInput.GetValue().strip(),
             self.customerPhoneInput.GetValue().strip(),
             self.customerAddressInput.GetValue().strip(),
             self.customerRemarkInput.GetValue().strip()
@@ -132,7 +147,7 @@ class CustomerWin(wx.Dialog):
     """
     def get_data(self):
         customer = self.get_form_values(True)
-        return customer + (self.data[5],)
+        return customer + (self.data[6],)
 
     """
     保存
@@ -146,4 +161,4 @@ class CustomerWin(wx.Dialog):
     """
     def update(self):
         customer = self.get_form_values(False)
-        return service.update_customer(self.data[5], customer)
+        return service.update_customer(self.data[6], customer)

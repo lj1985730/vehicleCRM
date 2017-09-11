@@ -16,7 +16,7 @@ class Auth:
         # 数据库对象
         db = sqlite.Database()
         # 操作语句
-        sql = "SELECT ID, NAME, TYPE FROM T_ACCOUNT WHERE NAME = ? AND PASSWORD = ? AND DELETED = 0;"
+        sql = "SELECT ID, NAME, TYPE, PASSWORD FROM T_ACCOUNT WHERE NAME = ? AND PASSWORD = ? AND DELETED = 0;"
         # 数据集合
         data = (account, password)
         # 执行数据库操作
@@ -32,6 +32,27 @@ class Auth:
             return True
 
     @classmethod
+    def change_pass(cls, old_pass, new_pass):
+
+        if cls.logon_user is None:
+            raise ValueError(u"请先登录！")
+
+        if old_pass is None or new_pass is None or old_pass.strip() == '' or new_pass.strip() == '':
+            raise ValueError(u"密码不可为空！")
+
+        if not cls.logon_user[3] == old_pass:
+            raise ValueError(u"输入旧密码不正确！")
+
+        # 数据库对象
+        db = sqlite.Database()
+        # 操作语句
+        sql = "UPDATE T_ACCOUNT SET PASSWORD = ? WHERE ID = ?;"
+        # 数据集合
+        data = (new_pass, cls.logon_user[0])
+        # 执行数据库操作
+        db.execute_update(sql, data)
+
+    @classmethod
     def logout(cls):
         cls.logon_user = None
 
@@ -39,22 +60,22 @@ class Auth:
     def get_logon_account(cls):
         return cls.logon_user
 
-    '''
-    激活
-    '''
     @classmethod
     def register(cls):
+        """
+        激活
+        """
         # 数据库对象
         db = sqlite.Database()
-        sql = "UPDATE T_DICT SET VALUE = 1 WHERE TYPE = 0"
+        sql = "UPDATE T_DICT SET VALUE = 1 WHERE TYPE = 0;"
         db.execute_update(sql, None)
 
-    '''
-    判断激活
-    '''
     @classmethod
     def registered(cls):
+        """
+        判断激活
+        """
         # 数据库对象
         db = sqlite.Database()
-        sql = "SELECT 1 FROM T_DICT WHERE TYPE = 0 AND VALUE = 1"
+        sql = "SELECT 1 FROM T_DICT WHERE TYPE = 0 AND VALUE = 1;"
         return db.execute_query(sql, None)

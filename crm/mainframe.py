@@ -1,7 +1,7 @@
 # coding=utf-8
 import wx
 import datetime
-from crm import loginwin, auth, customerpanel, vehiclepanel
+from crm import loginwin, changepasswin, auth, customerpanel, vehiclepanel
 import wx.lib.agw.flatnotebook as fnb
 
 
@@ -12,6 +12,7 @@ class MainFrame(wx.Frame):
     """
     def __init__(self, *args, **kw):
         super(MainFrame, self).__init__(*args, **kw)
+        self.change_pass_item = None
         self.customer_item = None
         self.vehicle_item = None
         self.make_menu_bar()    # 主菜单
@@ -35,6 +36,7 @@ class MainFrame(wx.Frame):
         operate_menu = wx.Menu()
 
         login_item = operate_menu.Append(-1, "登录(&L)", u"登录后方能操作")
+        self.change_pass_item = operate_menu.Append(-1, "修改密码(&P)", u"登录后方能操作")
 
         operate_menu.AppendSeparator()
 
@@ -52,6 +54,7 @@ class MainFrame(wx.Frame):
 
         # 绑定事件
         self.Bind(wx.EVT_MENU, self.on_login, login_item)
+        self.Bind(wx.EVT_MENU, self.on_change_pass, self.change_pass_item)
         self.Bind(wx.EVT_MENU, self.on_exit, exit_item)
         self.Bind(wx.EVT_MENU, self.on_show_customer, self.customer_item)
         self.Bind(wx.EVT_MENU, self.on_show_vehicle, self.vehicle_item)
@@ -61,6 +64,7 @@ class MainFrame(wx.Frame):
     切换按钮权限
     '''
     def toggle_menu(self):
+        self.change_pass_item.Enable(auth.Auth.logon_user is not None)
         self.customer_item.Enable(auth.Auth.logon_user is not None)
         self.vehicle_item.Enable(auth.Auth.logon_user is not None)
 
@@ -86,18 +90,10 @@ class MainFrame(wx.Frame):
         bmp = wx.Bitmap("data\\bg.jpg")
         dc.DrawBitmap(bmp, 0, 0)
 
-    '''
-    注销
-    '''
-    def on_exit(self, event):
-        auth.Auth.logout()
-        self.Close(True)
-
-    '''
-    账户登录
-    '''
     def on_login(self, event):
-
+        """
+        账户登录
+        """
         win = loginwin.LoginWin(self)
         win.CenterOnScreen()
 
@@ -106,7 +102,7 @@ class MainFrame(wx.Frame):
         if val == wx.ID_OK:
             login_result = win.do_login()
             if not login_result:
-                wx.MessageBox(u"用户名或密码错误！", u"错误", style=wx.ICON_ERROR)
+                wx.MessageBox(u"密码错误！", u"错误", style=wx.ICON_ERROR)
                 win.Destroy()
                 self.on_login(None)
                 return
@@ -123,18 +119,50 @@ class MainFrame(wx.Frame):
 
         win.Destroy()
 
-    '''
-    显示客户信息
-    '''
+    def on_change_pass(self, event):
+        """
+        修改密码
+        """
+        if auth.Auth.logon_user is None:
+            wx.MessageBox(u"请先登录", u"提示", style=wx.ICON_HAND)
+
+        win = changepasswin.ChangePassWin(self)
+        win.CenterOnScreen()
+
+        val = win.ShowModal()
+
+        if val == wx.ID_OK:
+            try:
+                win.change_pass()
+            except ValueError as e:
+                wx.MessageBox(str(e), "提示", style=wx.ICON_HAND)
+                win.Destroy()
+                self.on_change_pass(None)
+                return
+            else:
+                wx.MessageBox(u"修改成功，下次登陆请使用新密码！", "提示", style=wx.ICON_INFORMATION)
+
+        win.Destroy()
+
     def on_show_customer(self, event):
+        """
+        显示客户信息
+        """
         self.Freeze()
         self.book.AddPage(customerpanel.CustomerPanel(self.book), "客户信息", True)
         self.Thaw()
 
-    '''
-    显示客户信息
-    '''
     def on_show_vehicle(self, event):
+        """
+        显示车辆信息
+        """
         self.Freeze()
         self.book.AddPage(vehiclepanel.VehiclePanel(self.book), "车辆信息", True)
         self.Thaw()
+
+    def on_exit(self, event):
+        """
+        注销
+        """
+        auth.Auth.logout()
+        self.Close(True)

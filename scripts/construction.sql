@@ -21,6 +21,7 @@ CREATE TABLE T_CUSTOMER (
   ID          TEXT NOT NULL PRIMARY KEY,  --主键
   NAME        TEXT NOT NULL,               --姓名
   GENDER      INTEGER,                     --性别，1 男；2 女
+  ID_NUMBER   TEXT,                         --身份证号
   ADDRESS     TEXT,                         --地址
   PHONE       TEXT NOT NULL,               --电话
   REMARK      TEXT,                         --备注

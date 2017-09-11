@@ -1,7 +1,7 @@
 # coding=utf-8
 import wx
 import wx.grid as gridlib
-from crm import service, customerwin
+from crm import service, customerwin, idnumbervalidator
 
 
 class CustomerPanel(wx.Panel):
@@ -12,14 +12,20 @@ class CustomerPanel(wx.Panel):
         super().__init__(*args, **kw)
         self.grid = None
         self.edit_win = None
+        self.id_number_search = None
         self.init_layout()
 
-    """
-    展现渲染
-    """
     def init_layout(self):
+        """
+        展现渲染
+        """
         sizer = wx.BoxSizer(wx.VERTICAL)
         opt_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.id_number_search = wx.TextCtrl(self, wx.ID_ANY, "搜索身份证号...", size=wx.Size(200, -1),
+                                            validator=idnumbervalidator.IdNumberValidator(None))
+        opt_sizer.Add(self.id_number_search, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+        self.id_number_search.Bind(wx.EVT_KEY_UP, self.on_search, self.id_number_search)
 
         create_btn = wx.Button(self, wx.ID_ANY, u"新增")
         self.Bind(wx.EVT_BUTTON, self.open_create, create_btn)
@@ -40,10 +46,17 @@ class CustomerPanel(wx.Panel):
 
         self.SetSizer(sizer)
 
-    """
-    打开新增页
-    """
+    def on_search(self, event):
+        """
+        搜索
+        """
+        self.grid.GetTable().data = service.search_customer(None, self.id_number_search.GetValue())
+        self.grid.reset()
+
     def open_create(self, event):
+        """
+        打开新增页
+        """
         self.edit_win = customerwin.CustomerWin(self)
         self.edit_win.CenterOnScreen()
         val = self.edit_win.ShowModal()
@@ -55,13 +68,13 @@ class CustomerPanel(wx.Panel):
             else:
                 wx.MessageBox(u"保存成功！", "提示", style=wx.ICON_INFORMATION)
         self.edit_win.Destroy()
-        self.grid.GetTable().data = service.search_customer(None)
+        self.grid.GetTable().data = service.search_customer(None, self.id_number_search.GetValue())
         self.grid.reset()
 
-    """
-    打开修改页
-    """
     def open_modify(self, event):
+        """
+        打开修改页
+        """
         rows = self.grid.GetSelectedRows()
         if rows is None or len(rows) == 0:
             wx.MessageBox(u"请选择要修改的数据！", "提示", style=wx.ICON_HAND)
@@ -80,13 +93,13 @@ class CustomerPanel(wx.Panel):
             else:
                 wx.MessageBox(u"修改成功！", "提示", style=wx.ICON_INFORMATION)
         self.edit_win.Destroy()
-        self.grid.GetTable().data = service.search_customer(None)
+        self.grid.GetTable().data = service.search_customer(None, self.id_number_search.GetValue())
         self.grid.reset()
 
-    """
-    删除
-    """
     def on_delete(self, event):
+        """
+        删除
+        """
         rows = self.grid.GetSelectedRows()
         if rows is None or len(rows) == 0:
             wx.MessageBox(u"请选择要删除的数据！", "提示", style=wx.ICON_HAND)
@@ -101,9 +114,9 @@ class CustomerPanel(wx.Panel):
             return False
         dlg.Destroy()
 
-        service.delete_customer(select_data[5])
+        service.delete_customer(select_data[6])
 
-        self.grid.GetTable().data = service.search_customer(None)
+        self.grid.GetTable().data = service.search_customer(None, self.id_number_search.GetValue())
         self.grid.reset()
 
 
@@ -113,15 +126,16 @@ class CustomerDataTable(gridlib.GridTableBase):
     """
     def __init__(self):
         gridlib.GridTableBase.__init__(self)
-        self.colLabels = ['姓名', '性别', '电话', '住址', '备注']
+        self.colLabels = ['姓名', '性别', '身份证号', '电话', '住址', '备注']
         self.dataTypes = [
+            gridlib.GRID_VALUE_STRING,
             gridlib.GRID_VALUE_STRING,
             gridlib.GRID_VALUE_STRING,
             gridlib.GRID_VALUE_STRING,
             gridlib.GRID_VALUE_STRING,
             gridlib.GRID_VALUE_STRING
         ]
-        self.data = service.search_customer(None)
+        self.data = service.search_customer(None, None)
         self._rows = self.GetNumberRows()
         self._cols = self.GetNumberCols()
 
@@ -130,7 +144,7 @@ class CustomerDataTable(gridlib.GridTableBase):
         return len(self.data)
 
     def GetNumberCols(self):
-        return 5
+        return 6
 
     def IsEmptyCell(self, row, col):
         try:
@@ -150,10 +164,10 @@ class CustomerDataTable(gridlib.GridTableBase):
     def GetColLabelValue(self, col):
         return self.colLabels[col]
 
-    """
-    视图重置
-    """
     def reset_view(self, grid):
+        """
+        视图重置
+        """
         grid.BeginBatch()
 
         for current, new, del_msg, add_msg in [
@@ -199,61 +213,8 @@ class CustomerGrid(gridlib.Grid):
         self.SetColLabelAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
         self.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
 
-        # self.Bind(gridlib.EVT_GRID_LABEL_LEFT_CLICK, self.OnLabelLeftClick)
-
-    """
-    重置网格
-    """
     def reset(self):
+        """
+        重置网格
+        """
         self._table.reset_view(self)
-
-    # def OnLabelLeftClick(self, evt):
-    #     self.selected = evt.GetRow()
-
-        # simple cell formatting
-
-        # self.SetColSize(3, 200)
-        # self.SetRowSize(4, 45)
-        # self.SetCellValue(0, 0, "First cell")
-        # self.SetCellValue(1, 1, "Another cell")
-        # self.SetCellValue(2, 2, "Yet another cell")
-        # self.SetCellValue(3, 3, "This cell is read-only")
-        # self.SetCellFont(0, 0, wx.Font(12, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_ITALIC, wx.FONTWEIGHT_NORMAL))
-        # self.SetCellTextColour(1, 1, wx.RED)
-        # self.SetCellBackgroundColour(2, 2, wx.CYAN)
-        # self.SetReadOnly(3, 3, True)
-        #
-        # self.SetCellEditor(5, 0, gridlib.GridCellNumberEditor(1, 1000))
-        # self.SetCellValue(5, 0, "123")
-        # self.SetCellEditor(6, 0, gridlib.GridCellFloatEditor())
-        # self.SetCellValue(6, 0, "123.34")
-        # self.SetCellEditor(7, 0, gridlib.GridCellNumberEditor())
-        #
-        # self.SetCellValue(6, 3, "You can veto editing this cell")
-        #
-        # # self.SetRowLabelSize(0)
-        # # self.SetColLabelSize(0)
-        #
-        # # attribute objects let you keep a set of formatting values
-        # # in one spot, and reuse them if needed
-        # attr = gridlib.GridCellAttr()
-        # attr.SetTextColour(wx.BLACK)
-        # attr.SetBackgroundColour(wx.RED)
-        # attr.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD))
-        #
-        # # you can set cell attributes for the whole row (or column)
-        # self.SetRowAttr(5, attr)
-        #
-        # self.SetColLabelValue(0, "Custom")
-        # self.SetColLabelValue(1, "column")
-        # self.SetColLabelValue(2, "labels")
-        #
-        # self.SetColLabelAlignment(wx.ALIGN_LEFT, wx.ALIGN_BOTTOM)
-        #
-        # self.SetCellSize(11, 1, 3, 3)
-        # self.SetCellAlignment(11, 1, wx.ALIGN_CENTRE, wx.ALIGN_CENTRE)
-        # self.SetCellValue(11, 1, "This cell is set to span 3 rows and 3 columns")
-        #
-        # renderer = gridlib.GridCellAutoWrapStringRenderer()
-        # self.SetCellRenderer(15, 0, renderer)
-        # self.SetCellValue(15, 0, "The text in this cell will be rendered with word-wrapping")

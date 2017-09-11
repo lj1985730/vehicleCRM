@@ -19,7 +19,7 @@ class VehicleWin(wx.Dialog):
         border = wx.BoxSizer(wx.VERTICAL)
 
         # load customer combo data
-        self.customer_data = service.search_customer(None)
+        self.customer_data = service.search_customer(None, None)
 
         # load insurance company combo data
         self.company_data = service.search_dict(1)
@@ -316,7 +316,7 @@ class VehicleWin(wx.Dialog):
             return
 
         text = event.GetString().strip()
-        self.customer_data = service.search_customer(text)
+        self.customer_data = service.search_customer(text, None)
         data_count = len(self.customer_data)
 
         for index in range(0, data_count):
