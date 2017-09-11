@@ -154,7 +154,7 @@ def search_vehicle(alarm_day_count, plate_num):
     :parameter: alarm_day_count 提前报警天数
     :parameter: plate_num 车牌号
     :return: List[
-        (客户名称，客户性别，电话，
+        (客户名称，客户性别，身份证号，电话，
         车牌号，车辆型号，车辆登记日期，公里数，过户次数
         贷款产品，贷款期次，贷款年限，贷款金额，贷款提报日期，贷款通过日期，放款日期，
         承保公司，险种，保险生效日期，保险到期日期，
@@ -163,7 +163,7 @@ def search_vehicle(alarm_day_count, plate_num):
     # 数据库对象
     db = sqlite.Database()
     # 操作语句
-    sql = "SELECT B.NAME, CASE WHEN GENDER = 1 THEN '男' ELSE '女' END AS GENDER, B.PHONE, " \
+    sql = "SELECT B.NAME, CASE WHEN B.GENDER = 1 THEN '男' ELSE '女' END AS GENDER, B.ID_NUMBER, B.PHONE, " \
           "A.PLATE_NUM, A.MODEL, A.REG_DATE, A.MILEAGE, A.TRANSFER_COUNT, " \
           "A.LOAN_PRODUCT, A.LOAN_PERIOD, A.LOAN_TERM, A.LOAN_VALUE, A.LOAN_REPORT_DATE, " \
           "A.LOAN_PASSED_DATE, A.LOAN_DATE, " \
@@ -202,9 +202,6 @@ def save_vehicle(vehicle):
         备注)
     """
 
-    if check_plate_num_exist(vehicle[1], None):
-        raise ValueError("此车牌号已被使用！")
-
     # 数据库对象
     db = sqlite.Database()
     # 操作语句
@@ -225,9 +222,6 @@ def update_vehicle(data_id, vehicle):
         承保公司ID，险种，保险生效日期，保险到期日期，
         备注)
     """
-
-    if check_plate_num_exist(vehicle[1], data_id):
-        raise ValueError("此车牌号已被使用！")
 
     # 数据库对象
     db = sqlite.Database()

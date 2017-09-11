@@ -42,10 +42,10 @@ class VehicleWin(wx.Dialog):
         label.SetForegroundColour(wx.RED)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.customerCombobox =\
-            wx.ComboBox(self, wx.ID_ANY, size=wx.Size(140, -1), choices=[], style=wx.CB_DROPDOWN)
+            wx.ComboBox(self, wx.ID_ANY, size=wx.Size(120, -1), choices=[], style=wx.CB_DROPDOWN)
 
         for customer in self.customer_data:
-            self.customerCombobox.Append(customer[0], customer[5])
+            self.customerCombobox.Append(customer[0], customer[6])
 
         sizer.Add(self.customerCombobox, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.Bind(wx.EVT_COMBOBOX, self.select_customer, self.customerCombobox)
@@ -57,14 +57,21 @@ class VehicleWin(wx.Dialog):
         label = wx.StaticText(self, wx.ID_ANY, u"性别：", size=(60, -1), style=wx.ALIGN_RIGHT)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.customerGenderPanel =\
-            wx.StaticText(self, wx.ID_ANY, size=wx.Size(140, -1))
+            wx.StaticText(self, wx.ID_ANY, size=wx.Size(120, -1))
         sizer.Add(self.customerGenderPanel, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
+
+        # 身份证号
+        label = wx.StaticText(self, wx.ID_ANY, u"身份证号：", size=(60, -1), style=wx.ALIGN_RIGHT)
+        sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+        self.customerIdNumberPanel =\
+            wx.StaticText(self, wx.ID_ANY, size=wx.Size(130, -1))
+        sizer.Add(self.customerIdNumberPanel, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         # 客户电话
         label = wx.StaticText(self, wx.ID_ANY, u"电话：", size=(60, -1), style=wx.ALIGN_RIGHT)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.customerPhonePanel =\
-            wx.StaticText(self, wx.ID_ANY, size=wx.Size(140, -1))
+            wx.StaticText(self, wx.ID_ANY, size=wx.Size(120, -1))
         sizer.Add(self.customerPhonePanel, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         # new box -------------------------------------------------------------------------
@@ -78,19 +85,19 @@ class VehicleWin(wx.Dialog):
         box_sizer.Add(sizer)
 
         # 车牌号
-        label = wx.StaticText(self, wx.ID_ANY, u"* 车牌号：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label = wx.StaticText(self, wx.ID_ANY, u"* 车牌号：", size=(110, -1), style=wx.ALIGN_RIGHT)
         label.SetForegroundColour(wx.RED)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.vehiclePlateNumInput =\
-            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1), validator=platenumvalidator.PlateNumValidator(None))
+            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(230, -1), validator=platenumvalidator.PlateNumValidator(None))
         sizer.Add(self.vehiclePlateNumInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         # 车辆型号
-        label = wx.StaticText(self, wx.ID_ANY, u"* 车辆型号：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label = wx.StaticText(self, wx.ID_ANY, u"* 车辆型号：", size=(110, -1), style=wx.ALIGN_RIGHT)
         label.SetForegroundColour(wx.RED)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.vehicleModelInput =\
-            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1), validator=textvalidator.TextValidator(u"车辆型号"))
+            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(230, -1), validator=textvalidator.TextValidator(u"车辆型号"))
         sizer.Add(self.vehicleModelInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         # new line ########################################################################
@@ -98,19 +105,19 @@ class VehicleWin(wx.Dialog):
         box_sizer.Add(sizer)
 
         # 车辆登记日期
-        label = wx.StaticText(self, wx.ID_ANY, u"* 车辆登记日期：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label = wx.StaticText(self, wx.ID_ANY, u"* 车辆登记日期：", size=(110, -1), style=wx.ALIGN_RIGHT)
         label.SetForegroundColour(wx.RED)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.vehicleRegDate =\
-            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(200, -1),
+            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(230, -1),
                                   style=wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY)
         sizer.Add(self.vehicleRegDate, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         # 公里数
-        label = wx.StaticText(self, wx.ID_ANY, u"公里数：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label = wx.StaticText(self, wx.ID_ANY, u"公里数：", size=(110, -1), style=wx.ALIGN_RIGHT)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.mileageInput =\
-            intctrl.IntCtrl(self, wx.ID_ANY, size=wx.Size(200, -1))
+            intctrl.IntCtrl(self, wx.ID_ANY, size=wx.Size(230, -1))
         sizer.Add(self.mileageInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         # new line ########################################################################
@@ -118,11 +125,11 @@ class VehicleWin(wx.Dialog):
         box_sizer.Add(sizer)
 
         # 过户次数
-        label = wx.StaticText(self, wx.ID_ANY, u"* 过户次数：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label = wx.StaticText(self, wx.ID_ANY, u"* 过户次数：", size=(110, -1), style=wx.ALIGN_RIGHT)
         label.SetForegroundColour(wx.RED)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.transCountInput =\
-            intctrl.IntCtrl(self, wx.ID_ANY, 1, size=wx.Size(200, -1), min=0)
+            intctrl.IntCtrl(self, wx.ID_ANY, 1, size=wx.Size(230, -1), min=0)
         sizer.Add(self.transCountInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         # new box -------------------------------------------------------------------------
@@ -136,18 +143,18 @@ class VehicleWin(wx.Dialog):
         box_sizer.Add(sizer)
 
         # 贷款产品、期次
-        label = wx.StaticText(self, wx.ID_ANY, u"* 贷款产品：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label = wx.StaticText(self, wx.ID_ANY, u"* 贷款产品：", size=(110, -1), style=wx.ALIGN_RIGHT)
         label.SetForegroundColour(wx.RED)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.loanProductInput =\
-            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1), validator=textvalidator.TextValidator(u"贷款产品"))
+            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(230, -1), validator=textvalidator.TextValidator(u"贷款产品"))
         sizer.Add(self.loanProductInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
-        label = wx.StaticText(self, wx.ID_ANY, u"* 期次：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label = wx.StaticText(self, wx.ID_ANY, u"* 期次：", size=(110, -1), style=wx.ALIGN_RIGHT)
         label.SetForegroundColour(wx.RED)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.loanPeriodInput =\
-            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(200, -1), validator=textvalidator.TextValidator(u"期次"))
+            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(230, -1), validator=textvalidator.TextValidator(u"期次"))
         sizer.Add(self.loanPeriodInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         # new line ########################################################################
@@ -155,18 +162,18 @@ class VehicleWin(wx.Dialog):
         box_sizer.Add(sizer)
 
         # 贷款年限
-        label = wx.StaticText(self, wx.ID_ANY, u"* 贷款年限：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label = wx.StaticText(self, wx.ID_ANY, u"* 贷款年限：", size=(110, -1), style=wx.ALIGN_RIGHT)
         label.SetForegroundColour(wx.RED)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.loanTermInput =\
-            intctrl.IntCtrl(self, wx.ID_ANY, 1, size=wx.Size(200, -1), min=1)
+            intctrl.IntCtrl(self, wx.ID_ANY, 1, size=wx.Size(230, -1), min=1)
         sizer.Add(self.loanTermInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         # 贷款金额
-        label = wx.StaticText(self, wx.ID_ANY, u"贷款金额：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label = wx.StaticText(self, wx.ID_ANY, u"贷款金额：", size=(110, -1), style=wx.ALIGN_RIGHT)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.loanValueInput =\
-            intctrl.IntCtrl(self, wx.ID_ANY, 1, size=wx.Size(200, -1))
+            intctrl.IntCtrl(self, wx.ID_ANY, 1, size=wx.Size(230, -1))
         sizer.Add(self.loanValueInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         # new line ########################################################################
@@ -174,18 +181,18 @@ class VehicleWin(wx.Dialog):
         box_sizer.Add(sizer)
 
         # 贷款提报日期
-        label = wx.StaticText(self, wx.ID_ANY, u"贷款提报日期：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label = wx.StaticText(self, wx.ID_ANY, u"贷款提报日期：", size=(110, -1), style=wx.ALIGN_RIGHT)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.loanReportDate = \
-            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(200, -1),
+            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(230, -1),
                                   style=wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY | wx.adv.DP_ALLOWNONE)
         sizer.Add(self.loanReportDate, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         # 贷款通过日期
-        label = wx.StaticText(self, wx.ID_ANY, u"贷款通过日期：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label = wx.StaticText(self, wx.ID_ANY, u"贷款通过日期：", size=(110, -1), style=wx.ALIGN_RIGHT)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.loanPassedDate = \
-            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(200, -1),
+            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(230, -1),
                                   style=wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY | wx.adv.DP_ALLOWNONE)
         sizer.Add(self.loanPassedDate, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
@@ -194,11 +201,11 @@ class VehicleWin(wx.Dialog):
         box_sizer.Add(sizer)
 
         # 放款日期
-        label = wx.StaticText(self, wx.ID_ANY, u"* 放款日期：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label = wx.StaticText(self, wx.ID_ANY, u"* 放款日期：", size=(110, -1), style=wx.ALIGN_RIGHT)
         label.SetForegroundColour(wx.RED)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.loanDate = \
-            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(200, -1),
+            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(230, -1),
                                   style=wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY)
         sizer.Add(self.loanDate, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
@@ -213,26 +220,20 @@ class VehicleWin(wx.Dialog):
         box_sizer.Add(sizer)
 
         # 承保公司
-        label = wx.StaticText(self, wx.ID_ANY, u"承保公司：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label = wx.StaticText(self, wx.ID_ANY, u"承保公司：", size=(110, -1), style=wx.ALIGN_RIGHT)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.insuranceCompanyCombobox = \
-            wx.ComboBox(self, wx.ID_ANY, size=wx.Size(495, -1), choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
+            wx.ComboBox(self, wx.ID_ANY, size=wx.Size(230, -1), choices=[], style=wx.CB_DROPDOWN | wx.CB_READONLY)
         sizer.Add(self.insuranceCompanyCombobox, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         for company in self.company_data:
             self.insuranceCompanyCombobox.Append(company[1], company[0])
 
-        # self.Bind(wx.EVT_COMBOBOX, self.select_company, self.insuranceCompanyCombobox)
-
-        # new line ########################################################################
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        box_sizer.Add(sizer)
-
         # 险种
-        label = wx.StaticText(self, wx.ID_ANY, u"险种：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label = wx.StaticText(self, wx.ID_ANY, u"险种：", size=(110, -1), style=wx.ALIGN_RIGHT)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.insuranceTypeInput =\
-            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(495, -1))
+            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(230, -1))
         sizer.Add(self.insuranceTypeInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         # new line ########################################################################
@@ -240,21 +241,21 @@ class VehicleWin(wx.Dialog):
         box_sizer.Add(sizer)
 
         # 保险生效日期
-        label = wx.StaticText(self, wx.ID_ANY, u"* 保险生效日期：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label = wx.StaticText(self, wx.ID_ANY, u"* 保险生效日期：", size=(110, -1), style=wx.ALIGN_RIGHT)
         label.SetForegroundColour(wx.RED)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.insuranceStartDate = \
-            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(200, -1),
+            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(230, -1),
                                   style=wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY)
         sizer.Add(self.insuranceStartDate, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.Bind(wx.adv.EVT_DATE_CHANGED, self.get_end, self.insuranceStartDate)
 
         # 保险到期日期
-        label = wx.StaticText(self, wx.ID_ANY, u"* 保险到期日期：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label = wx.StaticText(self, wx.ID_ANY, u"* 保险到期日期：", size=(110, -1), style=wx.ALIGN_RIGHT)
         label.SetForegroundColour(wx.RED)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.insuranceEndDate = \
-            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(200, -1),
+            wx.adv.DatePickerCtrl(self, wx.ID_ANY, size=wx.Size(230, -1),
                                   style=wx.adv.DP_DROPDOWN | wx.adv.DP_SHOWCENTURY)
         sizer.Add(self.insuranceEndDate, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
@@ -263,10 +264,10 @@ class VehicleWin(wx.Dialog):
         border.Add(sizer, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
         # 备注
-        label = wx.StaticText(self, wx.ID_ANY, u"备注：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        label = wx.StaticText(self, wx.ID_ANY, u"备注：", size=(110, -1), style=wx.ALIGN_RIGHT)
         sizer.Add(label, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
         self.remarkInput =\
-            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(495, -1), style=wx.TE_MULTILINE)
+            wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(470, -1), style=wx.TE_MULTILINE)
         sizer.Add(self.remarkInput, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
 
         line = wx.StaticLine(self, -1, size=wx.DefaultSize, style=wx.HORIZONTAL)
@@ -320,7 +321,7 @@ class VehicleWin(wx.Dialog):
         data_count = len(self.customer_data)
 
         for index in range(0, data_count):
-            self.customerCombobox.Insert(self.customer_data[index][0], index, self.customer_data[index][5])
+            self.customerCombobox.Insert(self.customer_data[index][0], index, self.customer_data[index][6])
 
         for i in range(data_count, len(self.customerCombobox.GetItems())):
             self.customerCombobox.Delete(data_count)
@@ -335,7 +336,8 @@ class VehicleWin(wx.Dialog):
         data = cb.GetClientData(event.GetSelection())
         customer = self.customer_data[event.GetSelection()]
         self.customerGenderPanel.SetLabelText(customer[1])
-        self.customerPhonePanel.SetLabelText(customer[2])
+        self.customerIdNumberPanel.SetLabelText(customer[2])
+        self.customerPhonePanel.SetLabelText(customer[3])
         self.ignoreEvtText = True
         event.Skip()
 
@@ -348,38 +350,40 @@ class VehicleWin(wx.Dialog):
 
         if self.data[0] is not None:
             self.customerCombobox.SetValue(self.data[0])
+            self.customerCombobox.Select(0)
             self.customerGenderPanel.SetLabelText(self.data[1])
-            self.customerPhonePanel.SetLabelText(self.data[2])
+            self.customerIdNumberPanel.SetLabelText(self.data[2])
+            self.customerPhonePanel.SetLabelText(self.data[3])
 
-        self.vehiclePlateNumInput.SetValue(self.data[3])
-        self.vehiclePlateNumInput.SetValidator(platenumvalidator.PlateNumValidator(self.data[22]))
+        self.vehiclePlateNumInput.SetValue(self.data[4])
+        self.vehiclePlateNumInput.SetValidator(platenumvalidator.PlateNumValidator(self.data[23]))
 
-        self.vehicleModelInput.SetValue(self.data[4])
-        if self.data[5] is not None and self.data[5] != "":
-            self.vehicleRegDate.SetValue(self.parse_date(self.data[5]))
-        self.mileageInput.SetValue(self.data[6])
-        self.transCountInput.SetValue(self.data[7])
+        self.vehicleModelInput.SetValue(self.data[5])
+        if self.data[6] is not None and self.data[6] != "":
+            self.vehicleRegDate.SetValue(self.parse_date(self.data[6]))
+        self.mileageInput.SetValue(self.data[7])
+        self.transCountInput.SetValue(self.data[8])
 
-        self.loanProductInput.SetValue(self.data[8])
-        self.loanPeriodInput.SetValue(self.data[9])
-        self.loanTermInput.SetValue(self.data[10])
-        self.loanValueInput.SetValue(self.data[11])
-        if self.data[12] is not None and self.data[12] != "":
-            self.loanReportDate.SetValue(self.parse_date(self.data[12]))
+        self.loanProductInput.SetValue(self.data[9])
+        self.loanPeriodInput.SetValue(self.data[10])
+        self.loanTermInput.SetValue(self.data[11])
+        self.loanValueInput.SetValue(self.data[12])
         if self.data[13] is not None and self.data[13] != "":
-            self.loanPassedDate.SetValue(self.parse_date(self.data[13]))
+            self.loanReportDate.SetValue(self.parse_date(self.data[13]))
         if self.data[14] is not None and self.data[14] != "":
-            self.loanDate.SetValue(self.parse_date(self.data[14]))
+            self.loanPassedDate.SetValue(self.parse_date(self.data[14]))
+        if self.data[15] is not None and self.data[15] != "":
+            self.loanDate.SetValue(self.parse_date(self.data[15]))
 
-        if self.data[15] is not None:
-            self.insuranceCompanyCombobox.SetValue(self.data[15])
-        self.insuranceTypeInput.SetValue(self.data[16])
-        if self.data[16] is not None and self.data[17] != "":
-            self.insuranceStartDate.SetValue(self.parse_date(self.data[17]))
-        if self.data[17] is not None and self.data[18] != "":
-            self.insuranceEndDate.SetValue(self.parse_date(self.data[18]))
+        if self.data[16] is not None:
+            self.insuranceCompanyCombobox.SetValue(self.data[16])
+        self.insuranceTypeInput.SetValue(self.data[17])
+        if self.data[18] is not None and self.data[18] != "":
+            self.insuranceStartDate.SetValue(self.parse_date(self.data[18]))
+        if self.data[19] is not None and self.data[19] != "":
+            self.insuranceEndDate.SetValue(self.parse_date(self.data[19]))
 
-        self.remarkInput.SetValue(self.data[19])
+        self.remarkInput.SetValue(self.data[20])
 
     """
     表单取值
@@ -388,34 +392,34 @@ class VehicleWin(wx.Dialog):
         form_values = ()
         if self.customerCombobox.GetSelection() == -1:
             wx.MessageBox("请选择客户！", "提示", style=wx.ICON_HAND)
-            return False
+            return
         form_values = form_values + (self.customerCombobox.GetClientData(self.customerCombobox.GetSelection()),)
 
         if self.vehiclePlateNumInput.GetValue().strip() == "":
             wx.MessageBox("请输入车牌号！", "提示", style=wx.ICON_HAND)
-            return False
+            return
         form_values = form_values + (self.vehiclePlateNumInput.GetValue().strip(),)
 
         if self.vehicleModelInput.GetValue().strip() == "":
             wx.MessageBox("请输入车辆型号！", "提示", style=wx.ICON_HAND)
-            return False
+            return
         form_values = form_values + (self.vehicleModelInput.GetValue().strip(),)
 
         if not self.vehicleRegDate.GetValue().IsValid():
             wx.MessageBox("请输入车辆登记日期！", "提示", style=wx.ICON_HAND)
-            return False
+            return
         form_values = form_values + (self.vehicleRegDate.GetValue().Format(format="%Y-%m-%d"),)
 
         form_values = form_values + (self.mileageInput.GetValue(), self.transCountInput.GetValue())
 
         if self.loanProductInput.GetValue().strip() == "":
             wx.MessageBox("请输入贷款产品！", "提示", style=wx.ICON_HAND)
-            return False
+            return
         form_values = form_values + (self.loanProductInput.GetValue().strip(),)
 
         if self.loanPeriodInput.GetValue().strip() == "":
             wx.MessageBox("请输入期次！", "提示", style=wx.ICON_HAND)
-            return False
+            return
         form_values = form_values + (self.loanPeriodInput.GetValue().strip(),)
 
         form_values = form_values + (self.loanTermInput.GetValue(), self.loanValueInput.GetValue())
@@ -432,7 +436,7 @@ class VehicleWin(wx.Dialog):
 
         if not self.loanDate.GetValue().IsValid():
             wx.MessageBox("请输入放款日期！", "提示", style=wx.ICON_HAND)
-            return False
+            return
         form_values = form_values + (self.loanDate.GetValue().Format(format="%Y-%m-%d"),)
 
         if not self.insuranceCompanyCombobox.GetSelection() == -1:
@@ -445,12 +449,12 @@ class VehicleWin(wx.Dialog):
 
         if not self.insuranceStartDate.GetValue().IsValid():
             wx.MessageBox("请输入保险生效日期！", "提示", style=wx.ICON_HAND)
-            return False
+            return
         form_values = form_values + (self.insuranceStartDate.GetValue().Format(format="%Y-%m-%d"),)
 
         if not self.insuranceEndDate.GetValue().IsValid():
             wx.MessageBox("请输入保险到期日期！", "提示", style=wx.ICON_HAND)
-            return False
+            return
         form_values = form_values + (self.insuranceEndDate.GetValue().Format(format="%Y-%m-%d"),)
 
         form_values = form_values + (self.remarkInput.GetValue().strip(),)
@@ -462,7 +466,7 @@ class VehicleWin(wx.Dialog):
     """
     def get_data(self):
         vehicle = self.get_form_values()
-        return vehicle + (self.data[22],)
+        return vehicle + (self.data[23],)
 
     """
     保存
@@ -476,7 +480,7 @@ class VehicleWin(wx.Dialog):
     """
     def update(self):
         customer = self.get_form_values()
-        service.update_vehicle(self.data[22], customer)
+        service.update_vehicle(self.data[23], customer)
 
     '''
     时间字符串转wx.dateTime

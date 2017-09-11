@@ -15,6 +15,7 @@ class VehiclePanel(wx.Panel):
         self.alarm_checker = None
         self.grid = None
         self.edit_win = None
+        self.plate_number_search = None
         self.init_layout()
 
     """
@@ -23,6 +24,12 @@ class VehiclePanel(wx.Panel):
     def init_layout(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
         opt_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        label = wx.StaticText(self, wx.ID_ANY, u"搜索车牌号：", size=(95, -1), style=wx.ALIGN_RIGHT)
+        opt_sizer.Add(label, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+        self.plate_number_search = wx.TextCtrl(self, wx.ID_ANY, "", size=wx.Size(130, -1))
+        opt_sizer.Add(self.plate_number_search, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+        self.plate_number_search.Bind(wx.EVT_KEY_UP, self.on_search, self.plate_number_search)
 
         label = wx.StaticText(self, wx.ID_ANY, u"预警时间：", size=(95, -1), style=wx.ALIGN_RIGHT)
         opt_sizer.Add(label, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
@@ -33,7 +40,7 @@ class VehiclePanel(wx.Panel):
         self.alarm_checker.Append(u"60天内", 60)
         self.alarm_checker.Append(u"90天内", 90)
         self.alarm_checker.SetValue(u"全部")
-        self.Bind(wx.EVT_COMBOBOX, self.on_select_alarm, self.alarm_checker)
+        self.Bind(wx.EVT_COMBOBOX, self.on_search, self.alarm_checker)
         opt_sizer.Add(self.alarm_checker, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
         export_btn = wx.Button(self, wx.ID_ANY, u"导出")
@@ -59,19 +66,19 @@ class VehiclePanel(wx.Panel):
 
         self.SetSizer(sizer)
 
-    """
-    过滤预警数据
-    """
-    def on_select_alarm(self, event):
-        self.grid.GetTable().data =\
-            service.search_vehicle(self.alarm_checker.GetClientData(self.alarm_checker.GetSelection()))
+    def on_search(self, event):
+        """
+        搜索
+        """
+        self.grid.GetTable().data = service.search_vehicle(
+            self.alarm_checker.GetClientData(self.alarm_checker.GetSelection()), self.plate_number_search.GetValue())
         self.grid.reset()
         self.grid.add_warn()
 
-    """
-    打开新增页
-    """
     def open_create(self, event):
+        """
+        打开新增页
+        """
         self.edit_win = vehiclewin.VehicleWin(self)
         self.edit_win.CenterOnScreen()
         val = self.edit_win.ShowModal()
@@ -84,14 +91,15 @@ class VehiclePanel(wx.Panel):
                 wx.MessageBox(u"保存成功！", "提示", style=wx.ICON_INFORMATION)
         self.edit_win.Destroy()
         self.grid.GetTable().data =\
-            service.search_vehicle(self.alarm_checker.GetClientData(self.alarm_checker.GetSelection()))
+            service.search_vehicle(self.alarm_checker.GetClientData(self.alarm_checker.GetSelection()),
+                                   self.plate_number_search.GetValue())
         self.grid.reset()
         self.grid.add_warn()
 
-    """
-    打开修改页
-    """
     def open_modify(self, event):
+        """
+        打开修改页
+        """
         rows = self.grid.GetSelectedRows()
         if rows is None or len(rows) == 0:
             wx.MessageBox(u"请选择要修改的数据！", "提示", style=wx.ICON_HAND)
@@ -100,7 +108,7 @@ class VehiclePanel(wx.Panel):
         select_data = self.grid.GetTable().data[selected]
         self.edit_win = vehiclewin.VehicleWin(self)
         self.edit_win.set_data(select_data)
-        self.edit_win.auth_control()    # 权限控制
+        # self.edit_win.auth_control()    # 权限控制
         self.edit_win.CenterOnScreen()
         val = self.edit_win.ShowModal()
         if val == wx.ID_OK:
@@ -112,14 +120,15 @@ class VehiclePanel(wx.Panel):
                 wx.MessageBox(u"修改成功！", "提示", style=wx.ICON_INFORMATION)
         self.edit_win.Destroy()
         self.grid.GetTable().data =\
-            service.search_vehicle(self.alarm_checker.GetClientData(self.alarm_checker.GetSelection()))
+            service.search_vehicle(self.alarm_checker.GetClientData(self.alarm_checker.GetSelection()),
+                                   self.plate_number_search.GetValue())
         self.grid.reset()
         self.grid.add_warn()
 
-    """
-    删除
-    """
     def on_delete(self, event):
+        """
+        删除
+        """
         rows = self.grid.GetSelectedRows()
         if rows is None or len(rows) == 0:
             wx.MessageBox(u"请选择要删除的数据！", "提示", style=wx.ICON_HAND)
@@ -137,17 +146,19 @@ class VehiclePanel(wx.Panel):
         service.delete_vehicle(select_data[22])
 
         self.grid.GetTable().data =\
-            service.search_vehicle(self.alarm_checker.GetClientData(self.alarm_checker.GetSelection()))
+            service.search_vehicle(self.alarm_checker.GetClientData(self.alarm_checker.GetSelection()),
+                                   self.plate_number_search.GetValue())
         self.grid.reset()
         self.grid.add_warn()
 
-    """
-    导出excel
-    """
     def on_export(self, event):
+        """
+        导出excel
+        """
         file_name = u"车辆信息_" + datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         result = excelutil.ExcelUtil.export_vehicle(
-            (file_name, u"车辆信息", self.alarm_checker.GetClientData(self.alarm_checker.GetSelection())))
+            (file_name, u"车辆信息", self.alarm_checker.GetClientData(self.alarm_checker.GetSelection()),
+             self.plate_number_search.GetValue()))
         if result:
             wx.MessageBox(u"导出完成，请到程序根目录下export文件夹中获取导出的文件“" + file_name + ".xls”！",
                           "提示", style=wx.ICON_INFORMATION)
@@ -161,12 +172,13 @@ class VehicleDataTable(gridlib.GridTableBase):
     """
     def __init__(self):
         gridlib.GridTableBase.__init__(self)
-        self.colLabels = ['客户姓名', '客户性别', '客户电话',
+        self.colLabels = ['客户姓名', '客户性别', '身份证号', '客户电话',
                           '车牌号', '车辆型号', '车辆登记日期', '公里数', '过户次数',
                           '贷款产品', '贷款期次', '贷款年限', '贷款金额', '贷款提报日期', '贷款通过日期', '放款日期',
                           '承保公司', '险种', '保险生效日期', '保险到期日期',
                           '备注', '修改人', '修改时间']
         self.dataTypes = [
+            gridlib.GRID_VALUE_STRING,
             gridlib.GRID_VALUE_STRING,
             gridlib.GRID_VALUE_STRING,
             gridlib.GRID_VALUE_STRING,
@@ -204,7 +216,7 @@ class VehicleDataTable(gridlib.GridTableBase):
         return len(self.data)
 
     def GetNumberCols(self):
-        return 22
+        return 23
 
     def IsEmptyCell(self, row, col):
         try:
@@ -224,10 +236,10 @@ class VehicleDataTable(gridlib.GridTableBase):
     def GetColLabelValue(self, col):
         return self.colLabels[col]
 
-    """
-    视图重置
-    """
     def reset_view(self, grid):
+        """
+        视图重置
+        """
         grid.BeginBatch()
 
         for current, new, del_msg, add_msg in [
@@ -275,10 +287,10 @@ class VehicleGrid(gridlib.Grid):
 
         self.add_warn()
 
-    """
-    增加预警
-    """
     def add_warn(self):
+        """
+        增加预警
+        """
         # alarm threshold day
         today = datetime.date.today()
         threshold_day_30 = today + datetime.timedelta(days=30)
@@ -289,17 +301,17 @@ class VehicleGrid(gridlib.Grid):
         table_data = self._table.data
         for index in range(len(table_data)):
             self.set_row_normal(index)
-            if table_data[index][18] <= threshold_day_90.strftime('%Y-%m-%d'):
+            if table_data[index][19] <= threshold_day_90.strftime('%Y-%m-%d'):
                 self.set_row_yellow(index)
-            if table_data[index][18] <= threshold_day_60.strftime('%Y-%m-%d'):
+            if table_data[index][19] <= threshold_day_60.strftime('%Y-%m-%d'):
                 self.set_row_orange(index)
-            if table_data[index][18] <= threshold_day_30.strftime('%Y-%m-%d'):
+            if table_data[index][19] <= threshold_day_30.strftime('%Y-%m-%d'):
                 self.set_row_red(index)
 
-    """
-    重置网格
-    """
     def reset(self):
+        """
+        重置网格
+        """
         self._table.reset_view(self)
 
     def set_row_red(self, row_number):
