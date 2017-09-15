@@ -1,7 +1,7 @@
 # coding=utf-8
 import wx
 import datetime
-from crm import loginwin, changepasswin, auth, customerpanel, vehiclepanel
+from crm import loginwin, changepasswin, alarmwin, auth, customerpanel, vehiclepanel
 import wx.lib.agw.flatnotebook as fnb
 
 
@@ -117,7 +117,24 @@ class MainFrame(wx.Frame):
             self.toggle_menu()
             wx.MessageBox(u"登陆成功！", u"提示", style=wx.ICON_INFORMATION)
 
+            if alarmwin.AlarmWin.check_alarm():
+                self.do_alarm()
+
         win.Destroy()
+
+    def do_alarm(self):
+        """
+        弹窗提醒
+        """
+        alarm_win = alarmwin.AlarmWin(self)
+        alarm_win.CenterOnScreen()
+        alarm_val = alarm_win.ShowModal()
+        alarm_win.start()
+
+        if alarm_val == wx.ID_OK:
+            pass
+            # alarm_win.finish_alarm()
+        alarm_win.Destroy()
 
     def on_change_pass(self, event):
         """
