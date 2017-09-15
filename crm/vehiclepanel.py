@@ -1,7 +1,7 @@
 # coding=utf-8
 import wx
 import wx.grid as gridlib
-from crm import service, vehiclewin, excelutil
+from crm import service, vehiclewin, excelutil, auth
 import datetime
 
 
@@ -43,9 +43,10 @@ class VehiclePanel(wx.Panel):
         self.Bind(wx.EVT_COMBOBOX, self.on_search, self.alarm_checker)
         opt_sizer.Add(self.alarm_checker, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
-        export_btn = wx.Button(self, wx.ID_ANY, u"导出")
-        self.Bind(wx.EVT_BUTTON, self.on_export, export_btn)
-        opt_sizer.Add(export_btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+        if not auth.Auth.logon_user[2] == 2:
+            export_btn = wx.Button(self, wx.ID_ANY, u"导出")
+            self.Bind(wx.EVT_BUTTON, self.on_export, export_btn)
+            opt_sizer.Add(export_btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
         create_btn = wx.Button(self, wx.ID_ANY, u"新增")
         self.Bind(wx.EVT_BUTTON, self.open_create, create_btn)
