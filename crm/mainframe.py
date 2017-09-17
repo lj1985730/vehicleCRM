@@ -128,12 +128,11 @@ class MainFrame(wx.Frame):
         """
         alarm_win = alarmwin.AlarmWin(self)
         alarm_win.CenterOnScreen()
+        alarm_win.start_delay()
         alarm_val = alarm_win.ShowModal()
-        alarm_win.start()
 
         if alarm_val == wx.ID_OK:
-            pass
-            # alarm_win.finish_alarm()
+            alarm_win.finish_alarm()
         alarm_win.Destroy()
 
     def on_change_pass(self, event):

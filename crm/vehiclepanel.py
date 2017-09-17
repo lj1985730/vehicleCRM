@@ -309,6 +309,14 @@ class VehicleGrid(gridlib.Grid):
             if table_data[index][19] <= threshold_day_30.strftime('%Y-%m-%d'):
                 self.set_row_red(index)
 
+    def set_data(self, data):
+        """
+        :param data: 设置的数据
+        :return: void
+        """
+        self._table.data = data
+        self.reset()
+
     def reset(self):
         """
         重置网格
