@@ -98,7 +98,7 @@ class AlarmWin(wx.Dialog):
         判断是否存在提醒数据
         """
         data = service.search_vehicle(30, None)
-        return data is not None
+        return data is not None and len(data) > 0
 
     def on_export(self, event):
         """
