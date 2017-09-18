@@ -76,14 +76,20 @@ class AlarmWin(wx.Dialog):
         """
         if auth.Auth.logon_user is None:
             return False
-        if not AlarmWin.has_alarm():
-            return False
+
         current_user = auth.Auth.logon_user
         last_login = current_user[4]
-        if last_login is None or last_login == '':
-            return True
-        current_date = datetime.datetime.now().strftime('%Y-%m-%d')
-        return last_login < current_date
+        if last_login is not None and last_login != '':
+            current_date = datetime.datetime.now().strftime('%Y-%m-%d')
+            if last_login >= current_date:
+                return False
+
+        if not AlarmWin.has_alarm():
+            wx.MessageBox(u"今天无提醒数据！", u"提示", style=wx.ICON_INFORMATION)
+            AlarmWin.finish_alarm()
+            return False
+
+        return True
 
     @staticmethod
     def finish_alarm():
