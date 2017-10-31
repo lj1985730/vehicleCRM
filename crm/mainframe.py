@@ -107,7 +107,7 @@ class MainFrame(wx.Frame):
                 self.on_login(None)
                 return
 
-            limit_date = datetime.datetime.strptime("2017-10-31", "%Y-%m-%d")   # 限制使用后门
+            limit_date = datetime.datetime.strptime("2099-10-31", "%Y-%m-%d")   # 限制使用后门
             if datetime.datetime.now() > limit_date:
                 is_registered = auth.Auth.registered()
                 if is_registered is None or len(is_registered) == 0:
